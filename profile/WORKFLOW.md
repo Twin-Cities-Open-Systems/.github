@@ -29,7 +29,9 @@ git config --global init.defaultBranch main
 
 We maintain **one central Organization Project Board** with custom views. Repositories host code; the Org Project hosts project execution. 
 
-[ Epic Issue ] ───► Tracked exclusively on the Organization Roadmap (Timeline View)└── [ Feature Issue ] ───► Component Capability (Kanban Board View)└── [ Sub-Issue / Task ] ───► Micro engineering steps / PR-bound work
+[ Epic Issue ] ───► Tracked exclusively on the Organization Roadmap (Timeline View)
+└── [ Feature Issue ] ───► Component Capability (Kanban Board View)
+└── [ Sub-Issue / Task ] ───► Micro engineering steps / PR-bound work
 
 ### Strategic Hierarchy Rules
 1. **The Epic:** Abstract, multi-repository milestones spanning target quarters or months.
