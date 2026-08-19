@@ -1,0 +1,74 @@
+name: "TCOS Structural Invariant Audit"
+
+on:
+  workflow_call:
+    # Allows this workflow to be called dynamically from any repository in the organization
+
+jobs:
+  validate-headers:
+    name: "Enforce Scripting Header Rules"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Target Repository Code"
+        uses: actions/checkout@v4
+
+      - name: "Scan Userland Scripts for Mandatory Invariants"
+        shell: bash
+        run: |
+          echo "[+] Initializing TCOS architectural compliance sweep..."
+          FAILED=0
+
+          # Locate all shell, python, and awk scripts across userland directories
+          while IFS= read -r -d '' script_path; do
+              echo "--------------------------------------------------------"
+              echo "[*] Auditing file layout: $script_path"
+              
+              # Read first 4 lines into an execution array
+              IFS=$'\n' read -d '' -r -a header_lines < <(head -n 4 "$script_path") || true
+
+              # Line 1 Invariant: Shebang Verification
+              if [[ ! "${header_lines[0]}" =~ ^#\!/usr/bin/env[[:space:]]+[a-zA-Z0-9_-]+ ]]; then
+                  echo "  [❌] Line 1 Violation: Missing or non-portable shebang structure."
+                  echo "       Expected format: #!/usr/bin/env <tool_name>"
+                  echo "       Detected raw: '${header_lines[0]}'"
+                  FAILED=1
+              fi
+
+              # Line 2 Invariant: Author Attribution & Corporate Domain Signature
+              if [[ ! "${header_lines[1]}" =~ ^#[[:space:]]*[A-Za-z[:space:]]+[[:space:]]+<[a-zA-Z0-9._%+-]+@tcos\.us> ]]; then
+                  echo "  [❌] Line 2 Violation: Missing or invalid author attribution tracking code."
+                  echo "       Expected format: # Developer Name <email@tcos.us>"
+                  echo "       Detected raw: '${header_lines[1]}'"
+                  FAILED=1
+              fi
+
+              # Line 3 Invariant: Exact Local Base Filename Match
+              expected_filename=$(basename "$script_path")
+              if [[ ! "${header_lines[2]}" =~ ^#[[:space:]]*${expected_filename}$ ]]; then
+                  echo "  [❌] Line 3 Violation: Missing or mismatched filename reference."
+                  echo "       Expected format: # $expected_filename"
+                  echo "       Detected raw: '${header_lines[2]}'"
+                  FAILED=1
+              fi
+
+              # Line 4 Invariant: Functional Context Abstract Text
+              if [[ ! "${header_lines[3]}" =~ ^#[[:space:]]*[A-Za-z0-9] ]]; then
+                  echo "  [❌] Line 4 Violation: Missing or blank functional description narrative."
+                  echo "       Expected format: # This script executes foo bar and baz."
+                  echo "       Detected raw: '${header_lines[3]}'"
+                  FAILED=1
+              fi
+
+          done < <(find . -type f \( -name "*.sh" -o -name "*.py" -o -name "*.awk" \) -not -path "*/.*" -print0)
+
+          if [ "$FAILED" -ne 0 ]; then
+              echo "========================================================"
+              echo "[❌] System architectural invariants broken. Process terminated."
+              echo "========================================================"
+              exit 1
+          else
+              echo "========================================================"
+              echo "[✅] All local scripting assets verified compliant with TCOS standards."
+              echo "========================================================"
+          fi
+
