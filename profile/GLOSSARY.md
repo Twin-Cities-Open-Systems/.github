@@ -12,7 +12,6 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 ---
 
 ## 1. Core Dictionary & Invariants
-*System invariants declare how terms MUST be applied. These rules are strictly enforced by our workspace linters.*
 
 ### Twin Cities Open Systems
 * **Type:** Organization Name
@@ -33,7 +32,6 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 ---
 
 ## 2. Acronym Expander
-*Automated parsers use this section to expand shorthand references in system logs, documentation headers, and commit messages.*
 
 | Shorthand | Expanded Meaning | Associated Core Repository |
 | :--- | :--- | :--- |
@@ -48,7 +46,6 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 ---
 
 ## 3. Systematic Thesaurus (Context Mapper)
-*Maps colloquial words to our precise enterprise technical terms to prevent language ambiguity.*
 
 * **Instead of:** `credentials`, `resume profile`, `history`
   * **Use TCOS Standard:** `Pedigree` (when referring to founder backgrounds) or `Track Record` (when referring to repository execution history).
@@ -62,7 +59,6 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 ---
 
 ## 4. Scripting & Code Header Invariants
-*All automation assets, utilities, and userland scripts originating within TCOS domains must enforce this standard.*
 
 ### Mandatory Execution Block (First 4 Lines)
 Every script executing inside a userland shell layer must match this structural signature across its initial 4 lines without exception:
@@ -74,18 +70,4 @@ Every script executing inside a userland shell layer must match this structural 
 
 ### Library & Mixin Invariant (Non-Executable Scripts)
 * **Type:** Structural Code Paradigm
-* **Invariant Standard:** Code assets containing reusable function blocks, hooks, or environment wrappers (e.g., `cron_sweep_repo.bash`) that are designed exclusively to be sourced by other runtime controllers must not contain a shebang line and must remain non-executable (`chmod -x`). 
-
-### Reference Example (`bin/cron_sweep_repo.bash`)
-```bash
-# Spencer Butler <dev@tcos.us>
-# cron_sweep_repo.bash
-# Sourced library containing non-interactive workspace synchronization blocks.
-#
-# This file is an operational library and cannot be executed directly.
-
-cron_sweep_repo() {
-    # Function logic lives here safely without an execution layer
-    echo "[+] Sourced function routine invoked."
-}
-```
+* **Invariant Standard:** Code assets containing reusable function blocks, hooks, or environment wrappers (e.g., `cron_sweep_repo.bash`) that are designed exclusively to be sourced by other runtime controllers must not contain a shebang line and must remain non-executable (`chmod -x`).
