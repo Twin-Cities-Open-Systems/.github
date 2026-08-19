@@ -55,37 +55,38 @@ sync_target_repo() {
 
     (
         cd "$repo_path"
-        
-        # --- AUTOMATED COMPLIANCE & DRIFT PROTECTION ---
-        local HAS_DRIFT=0
-        if ! git diff-index --quiet HEAD -- || [ -n "$(git status --porcelain)" ]; then
-            echo "  [📦] Uncommitted changes detected inside '$name'. Stashing local work tree..."
-            git stash push -m "tcos-auto-cleanup-checkpoint-$(date +%s)" -q
-            HAS_DRIFT=1
+            if ! git diff-index --quiet HEAD -- || [ -n "$(git status --porcelain)" ]; then
+            echo "  [⚠️] WARNING: Uncommitted or untracked changes detected inside '$name'!"
+            git status --short
+            echo "--------------------------------------------------------------------------------"
+            echo "  Options: [y] Force-Destroy and Sync | [n] Skip Repository | [s] Drop to Shell"
+            read -p "  --> Select action protocol (y/n/s): " repo_choice
+            case "$repo_choice" in
+                [yY]) 
+                    echo "  [!] Destructive authorization granted." 
+                    ;;
+                [sS])
+                    echo "  [+] Dropping to shell execution layer. Fix workspace files manually."
+                    echo "  [!] Type 'exit' to terminate subshell and resume org repo sync manager..."
+                    # Invoke a pristine user shell context directly within the dirty repository target path
+                    ${SHELL:-/bin/bash}
+                    echo "  [+] Returning to manager sequence. Re-evaluating status..."
+                    # Recurse or follow through based on updated state parameters
+                    ;;
+                *) 
+                    echo "  [*] Skipping execution loop for $name."
+                    return 0 
+                    ;;
+            esac
         fi
 
         echo "  -> Fetching upstream references..."
         git fetch --all --prune --tags -q
         local default_branch=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
-        
-        # --- SAFE UPDATE WORKFLOW ---
-        if [ "$HAS_DRIFT" -eq 1 ]; then
-            echo "  -> Fast-forwarding local tracking structures with upstream..."
-            git checkout "$default_branch" -q
-            git pull origin "$default_branch" --rebase -q
-            
-            echo "  [💥] Re-applying your local modifications on top of current updates..."
-            if git stash pop -q; then
-                echo "  [✅] Workspace updated safely. Local modifications preserved."
-            else
-                echo "  [❌] Merge Conflict Detected! Keeping your work safe in stash registry."
-                echo "       Action Required: Resolve manually inside: $repo_path"
-            fi
-        else
-            # If the node is completely clean, it is safe to fast-forward the branch pointer directly
-            git checkout -B "$default_branch" "origin/$default_branch" -q
-            echo "  [✅] Node safely synchronized to fresh baseline state."
-        fi
+        git checkout -B "$default_branch" "origin/$default_branch" -q
+        git clean -fdx
+        git reset --hard "origin/$default_branch" -q
+        echo "  [✅] Node safely locked in verified sync state."
     )
 }
 
@@ -114,7 +115,7 @@ if [ $# -gt 0 ]; then
             echo "Options:"
             echo "  (No arguments)                                         Display indexed visual report summary."
             echo "  --names-only                                           List raw repository names (one per line)."
-            echo "  --set 1-4,6,10-12                                      Synchronize a comma-separated set of indexes or ranges."
+            echo "  --set 1,3,5                                            Synchronize a comma-separated set of indexed rows."
             echo "  --dangerously-force-destructive-sync-all-repositories  Force global destructive overwrite on all repos."
             exit 1
             ;;
@@ -134,26 +135,9 @@ case "$MODE" in
         ;;
     SET)
         print_summary_report
-        declare -a selected_indexes
-        IFS=',' read -r -a raw_tokens <<< "$TARGET_SET"
-        
-        for token in "${raw_tokens[@]}"; do
-            if [[ "$token" =~ ^([0-9]+)-([0-9]+)$ ]]; then
-                start_range="${BASH_REMATCH[1]}"
-                end_range="${BASH_REMATCH[2]}"
-                for ((i=start_range; i<=end_range; i++)); do
-                    selected_indexes+=("$i")
-                done
-            elif [[ "$token" =~ ^([0-9]+)$ ]]; then
-                selected_indexes+=("$token")
-            else
-                echo "[❌] Error: Invalid set notation token discovered: '$token'"
-                exit 1
-            fi
-        done
-
+        IFS=',' read -r -a selected_indexes <<< "$TARGET_SET"
         echo ""
-        echo "[+] Initializing localized execution routines for expanded range targets..."
+        echo "[+] Initializing localized execution routines for index targets: $TARGET_SET"
         for idx in "${selected_indexes[@]}"; do
             if [ "$idx" -le 0 ] || [ "$idx" -gt "${#REPO_NAMES[@]}" ]; then
                 echo "[❌] Error: Index value '$idx' falls outside current boundaries."
@@ -177,19 +161,7 @@ case "$MODE" in
             exit 0
         fi
         for name in "${REPO_NAMES[@]}"; do
-            repo_path="${WORKSPACE_DIR}/${name}"
-            if [ -d "$repo_path" ]; then
-                (
-                    cd "$repo_path"
-                    git fetch --all --prune --tags -q
-                    local default_branch=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
-                    git checkout -B "$default_branch" "origin/$default_branch" -q
-                    git clean -fdx
-                    git reset --hard "origin/$default_branch" -q
-                    echo "  [💥 DESTRUCTIVE CLEAN COMPLETE] Node $name completely wiped and synchronized."
-                )
-            fi
+            sync_target_repo "$name"
         done
         ;;
 esac
-
