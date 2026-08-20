@@ -1,4 +1,4 @@
-# verify_commit_push_readme.bash
+# bin/verify_commit_push_readme.bash
 
 for repo in $(./bin/manage-org-repos.sh --names-only); do
     repo_path="${HOME}/git/${repo}"
