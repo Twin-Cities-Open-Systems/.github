@@ -86,6 +86,44 @@ sync_target_repo() {
             git checkout -B "$default_branch" "origin/$default_branch" -q
             echo "  [✅] Node safely synchronized to fresh baseline state."
         fi
+
+        # --- ENHANCED COMPLIANCE WORKFLOW WITH AUTOMATED PR FALLBACK ---
+        echo "  -> Evaluating server-side merge protection status..."
+        
+        # Check if direct push to the default branch is blocked by the active ruleset
+        if gh ruleset check --default 2>&1 | grep -q "Block force pushes" || \
+           gh repo view "$TARGET_ORG/$name" --json defaultBranchRef | jq -r '.defaultBranchRef.name' &>/dev/null; then
+            
+            # If branch protections are active, isolate modifications onto a standardized feature branch
+            local feat_branch="feature/tcos-compliance-alignment"
+            echo "  [🛡️] Branch Protection Confirmed. Shifting to track: $feat_branch"
+            
+            git checkout -b "$feat_branch" -q
+            
+            # If we had local changes, pop them safely onto the clean feature branch structure
+            if [ "$HAS_DRIFT" -eq 1 ]; then
+                git stash pop -q
+                git add README.md
+                git commit -m "docs: align documentation with master TCOS blueprint" -q
+                
+                echo "  -> Publishing isolated tracking branch upstream..."
+                git push origin "$feat_branch" --force-with-lease -q
+                
+                # Automatically open a pull request into the mainline tracking trunk
+                echo "  -> Registering formal pull request across the organization framework..."
+                gh pr create --title "docs: align documentation with master TCOS blueprint" \
+                             --body "Automated organizational documentation alignment sweep." \
+                             --fill \
+                             --repo "$TARGET_ORG/$name" -q || true
+            fi
+        else
+            # Fallback for standard unprotected sandbox environments if encountered
+            git checkout -B "$default_branch" "origin/$default_branch" -q
+            if [ "$HAS_DRIFT" -eq 1 ]; then
+                git stash pop -q
+            fi
+            echo "  [✅] Node safely synchronized to fresh baseline state."
+        fi
     )
 }
 
