@@ -3,9 +3,22 @@ name: "TCOS Structural Invariant Audit"
 on:
   workflow_call:
     # Allows this workflow to be called dynamically from any repository in the organization
+    inputs:
+      enforce_headers:
+        description: >-
+          Run the scripting-header format check. Off by default --
+          it encodes one specific header convention (a separate
+          author-attribution line) that not every repo follows (e.g.
+          fleet-ops's own scripts use a different, equally valid
+          shebang+description style). Opt in only if your repo
+          actually follows the convention this job checks.
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   validate-headers:
+    if: ${{ inputs.enforce_headers }}
     name: "Enforce Scripting Header Rules"
     runs-on: ubuntu-latest
     steps:
@@ -22,7 +35,7 @@ jobs:
           while IFS= read -r -d '' script_path; do
               echo "--------------------------------------------------------"
               echo "[*] Auditing file layout: $script_path"
-              
+
               # Read first 4 lines into an execution array
               IFS=$'\n' read -d '' -r -a header_lines < <(head -n 4 "$script_path") || true
 
@@ -72,3 +85,42 @@ jobs:
               echo "========================================================"
           fi
 
+  detect-placeholder-content:
+    name: "Block unfilled template placeholders"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Target Repository Code"
+        uses: actions/checkout@v4
+
+      - name: "Scan tracked files for known unfilled-template markers"
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Real strings found live in fleet-ops#195 -- a bulk README
+          # template got applied to a repo with real, substantive docs,
+          # overwriting them with unfilled placeholder text. Each
+          # pattern here is a literal string actually seen in the wild,
+          # not a guess -- same "fail few" philosophy as
+          # check-shell-footguns.sh.
+          PATTERNS=(
+            '\[Insert the precise'
+            '\[Public \| Private ->'
+          )
+
+          FAILED=0
+          for pattern in "${PATTERNS[@]}"; do
+            if hits=$(grep -rIln --exclude-dir=.git -E "$pattern" . 2>/dev/null); then
+              echo "[❌] Unfilled template placeholder found (pattern: $pattern):"
+              echo "$hits" | sed 's/^/    /'
+              FAILED=1
+            fi
+          done
+
+          if [ "$FAILED" -ne 0 ]; then
+            echo
+            echo "A generic template appears to have been applied without being filled in,"
+            echo "or real content got overwritten by one. Fill in the placeholder(s) or"
+            echo "restore the original content before merging."
+            exit 1
+          fi
+          echo "[✅] No unfilled template placeholders found."
