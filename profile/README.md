@@ -15,40 +15,40 @@ Our organization operates under a strict **Public by Default** engineering stand
 This index catalogs the active nodes across the TCOS platform. High-level summaries are visible to the public; deeper structural links adapt automatically for authenticated organization members.
 
 ### 🌐 Core Open Source Offerings & Infrastructure
-* ### [.github](https://github.com/Twin-Cities-Open-Systems/.github) (Public) (Command Center)
+* ### [.github](../../../../.github) (Public) (Command Center)
   * **Purpose:** Serves as the global organizational controller and centralized governance repository for the entire TCOS GitHub ecosystem.
-* ### [human-execution-engine](https://github.com/Twin-Cities-Open-Systems/human-execution-engine) (Public) (Canonical Doctrine)
+* ### [human-execution-engine](../../../../human-execution-engine) (Public) (Canonical Doctrine)
   * **Purpose:** The doctrine/governance framework and the fleet's actual authority-contract instances -- the specification the org's roles, contracts, and process rules are drawn from.
-* ### [market-thesis](https://github.com/Twin-Cities-Open-Systems/market-thesis) (Public)
+* ### [market-thesis](../../../../market-thesis) (Public)
   * **Purpose:** Acts as a centralized public repository to document, validate, and manage macro-economic research, trading frameworks, and quantitative market strategies.
-* ### [tick-task](https://github.com/Twin-Cities-Open-Systems/tick-task) (Public)
+* ### [tick-task](../../../../tick-task) (Public)
   * **Purpose:** Orchestrates high-frequency, time-critical tasks and event-driven automation sequences calibrated to match rapid financial data ticks.
-* ### [mt-logo-render](https://github.com/Twin-Cities-Open-Systems/mt-logo-render) (Public)
+* ### [mt-logo-render](../../../../mt-logo-render) (Public)
   * **Purpose:** Provides a high-performance utility that programmatically generates cryptographic hashes and image outputs from design recipes.
-* ### [hee-epoch](https://github.com/Twin-Cities-Open-Systems/hee-epoch) (Public)
+* ### [hee-epoch](../../../../hee-epoch) (Public)
   * **Purpose:** Serves as the running, real-time historical narrative and foundational record documenting the genesis work and milestones of TCOS.
 
 ### 🔄 Planned Open Source Migrations
-* ### market-thesis-news (Private -> Public)
+* ### [market-thesis-news](../../../../market-thesis-news) (Private -> Public)
   * **Purpose:** Automates the extraction, processing, and contextualization of financial news feeds to actively track real-time macro updates.
-* ### dotfiles (Private -> Public)
+* ### [dotfiles](../../../../dotfiles) (Private -> Public)
   * **Purpose:** Provides a unified, portable environment configuration setup designed to synchronize cross-platform multi-shell developer layouts.
-* ### glass-ops (Private -> Public)
+* ### [glass-ops](../../../../glass-ops) (Private -> Public)
   * **Purpose:** Acts as a specialized bare-metal display driver and user interface orchestrator that directly controls window layouts on physical monitors.
-* ### inbound (NoCommits -> Private -> Public)
+* ### [inbound](../../../../inbound) (NoCommits -> Private -> Public)
   * **Purpose:** Acts as the secure edge ingestion layer designed to accept, sanitize, and route unstructured external inputs (e.g., career forms).
 
 ### 🛡️ Private Operations & Custodial Services
-* ### thesis-engine (Very Private) (Core IP)
+* ### [thesis-engine](../../../../thesis-engine) (Very Private) (Core IP)
   * **Purpose:** Serves as the proprietary core simulation and computational verification engine that validates all multi-agent workflows.
-* ### fleet-ops (Private) (Internal Operations)
+* ### [fleet-ops](../../../../fleet-ops) (Private) (Internal Operations)
   * **Purpose:** Serves as the centralized command hub for daily internal operations, resource scheduling engines, and administrative workflow automation.
-* ### tcos-plan-private (Very Private) (Core IP)
+* ### [tcos-plan-private](../../../../tcos-plan-private) (Very Private) (Core IP)
   * **Purpose:** Serves as the central repository for internal organizational roadmaps, strategic business planning, and high-level project governance.
-* ### tcos-audit (Private) (Internal Custodian)
+* ### [tcos-audit](../../../../tcos-audit) (Private) (Internal Custodian)
   * **Purpose:** Functions as an internal security guardrail engineered to prevent IP exposure, PII leakage, and credential disclosure across all code nodes.
 
 ---
 
 ## 📜 Regulatory Governance & Compliance
-All codebases, userland utilities, and documentation entries across this organization must strictly conform to our global definitions, scripting headers, and data layout protocols. For complete implementation details, review the [TCOS Global Glossary & Invariant Declaration](https://github.com/Twin-Cities-Open-Systems/.github/blob/main/profile/GLOSSARY.md).
+All codebases, userland utilities, and documentation entries across this organization must strictly conform to our global definitions, scripting headers, and data layout protocols. For complete implementation details, review the [TCOS Global Glossary & Invariant Declaration](GLOSSARY.md).
