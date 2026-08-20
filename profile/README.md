@@ -17,6 +17,8 @@ This index catalogs the active nodes across the TCOS platform. High-level summar
 ### 🌐 Core Open Source Offerings & Infrastructure
 * ### [.github](../.github) (Public) (Command Center)
   * **Purpose:** Serves as the global organizational controller and centralized governance repository for the entire TCOS GitHub ecosystem.
+* ### [human-execution-engine](../human-execution-engine) (Public) (Canonical Doctrine)
+  * **Purpose:** The doctrine/governance framework and the fleet's actual authority-contract instances -- the specification the org's roles, contracts, and process rules are drawn from.
 * ### [market-thesis](../market-thesis) (Public)
   * **Purpose:** Acts as a centralized public repository to document, validate, and manage macro-economic research, trading frameworks, and quantitative market strategies.
 * ### [tick-task](../tick-task) (Public)
