@@ -1,0 +1,28 @@
+# Twin Cities Open Systems (TCOS)
+# tcos-audit-rules.toml
+# Centralized Gitleaks rule configuration for tracking IP, PII, and secret leak vectors.
+
+[allowlist]
+description = "Global organizational exception tokens"
+paths = [
+    '''profile/GLOSSARY\.md$''',
+    '''\.tcos-rel-link-store$'''
+]
+
+[[rules]]
+id = "tcos-corporate-credential"
+description = "Identifies unredacted internal development identity tokens"
+regex = '''(?i)spencer\s*=\s*['"][a-f0-9]{32,}['"]'''
+secretGroup = 0
+
+[[rules]]
+id = "generic-private-key"
+description = "Intercepts unencrypted asymmetric private cryptographic keys"
+regex = '''-----BEGIN\s+(?:RSA|OPENSSH|EC|DSA)?\s+PRIVATE\s+KEY-----'''
+
+[[rules]]
+id = "tcos-api-token"
+description = "Tracks leaked proprietary API authorization strings matching corporate prefixes"
+regex = '''tcos_[a-zA-Z0-9]{32,48}'''
+secretGroup = 0
+
