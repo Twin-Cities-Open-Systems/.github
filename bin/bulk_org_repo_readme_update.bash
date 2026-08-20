@@ -1,4 +1,4 @@
-# bulk_org_repo_readme_update.bash
+# bin/bulk_org_repo_readme_update.bash
 
 for repo in $(./bin/manage-org-repos.sh --names-only); do
     target_readme="${HOME}/git/${repo}/README.md"
