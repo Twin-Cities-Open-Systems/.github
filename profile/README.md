@@ -29,23 +29,23 @@ This index catalogs the active nodes across the TCOS platform. High-level summar
   * **Purpose:** Serves as the running, real-time historical narrative and foundational record documenting the genesis work and milestones of TCOS.
 
 ### 🔄 Planned Open Source Migrations
-* ### [market-thesis-news](https://github.com/Twin-Cities-Open-Systems/market-thesis-news) (Private -> Public)
+* ### market-thesis-news (Private -> Public)
   * **Purpose:** Automates the extraction, processing, and contextualization of financial news feeds to actively track real-time macro updates.
-* ### [dotfiles](https://github.com/Twin-Cities-Open-Systems/dotfiles) (Private -> Public)
+* ### dotfiles (Private -> Public)
   * **Purpose:** Provides a unified, portable environment configuration setup designed to synchronize cross-platform multi-shell developer layouts.
-* ### [glass-ops](https://github.com/Twin-Cities-Open-Systems/glass-ops) (Private -> Public)
+* ### glass-ops (Private -> Public)
   * **Purpose:** Acts as a specialized bare-metal display driver and user interface orchestrator that directly controls window layouts on physical monitors.
-* ### [inbound](https://github.com/Twin-Cities-Open-Systems/inbound) (NoCommits -> Private -> Public)
+* ### inbound (NoCommits -> Private -> Public)
   * **Purpose:** Acts as the secure edge ingestion layer designed to accept, sanitize, and route unstructured external inputs (e.g., career forms).
 
 ### 🛡️ Private Operations & Custodial Services
-* ### [thesis-engine](https://github.com/Twin-Cities-Open-Systems/thesis-engine) (Very Private) (Core IP)
+* ### thesis-engine (Very Private) (Core IP)
   * **Purpose:** Serves as the proprietary core simulation and computational verification engine that validates all multi-agent workflows.
-* ### [fleet-ops](https://github.com/Twin-Cities-Open-Systems/fleet-ops) (Private) (Internal Operations)
+* ### fleet-ops (Private) (Internal Operations)
   * **Purpose:** Serves as the centralized command hub for daily internal operations, resource scheduling engines, and administrative workflow automation.
-* ### [tcos-plan-private](https://github.com/Twin-Cities-Open-Systems/tcos-plan-private) (Very Private) (Core IP)
+* ### tcos-plan-private (Very Private) (Core IP)
   * **Purpose:** Serves as the central repository for internal organizational roadmaps, strategic business planning, and high-level project governance.
-* ### [tcos-audit](https://github.com/Twin-Cities-Open-Systems/tcos-audit) (Private) (Internal Custodian)
+* ### tcos-audit (Private) (Internal Custodian)
   * **Purpose:** Functions as an internal security guardrail engineered to prevent IP exposure, PII leakage, and credential disclosure across all code nodes.
 
 ---
