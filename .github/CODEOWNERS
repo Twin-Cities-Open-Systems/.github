@@ -1,0 +1,13 @@
+# ==============================================================================
+# TCOS Centralized Global Code Owners Policy
+# Enforces automated review assignments across all organization repositories.
+# ==============================================================================
+
+# Global Fallback: Spencer Butler owns all organizational trunks by default
+*       @spencerbutler # Replace with your exact GitHub handle or Organization Team Name
+
+# Infrastructure & Automation Guardrails
+/bin/   @spencerbutler
+
+# Proprietary Compute Core Protection
+/core/  @spencerbutler
