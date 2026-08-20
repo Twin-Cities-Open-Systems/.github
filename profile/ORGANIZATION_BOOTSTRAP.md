@@ -28,3 +28,4 @@ This playbook defines the required architecture and configuration sequence for b
 * **Userland Tools:** Any script running inside a user shell must use a portable shebang directive (`#!/usr/bin/env <tool>`) and a mandatory 4-line tracking metadata header block.
 * **Function Libraries:** Reusable modules or script wrappers meant strictly to be sourced must omit the execution bit (`chmod -x`) and contain no shebang line.
 
+<-H Hook Guard Verification Trace -->
