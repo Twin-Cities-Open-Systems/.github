@@ -68,39 +68,53 @@ sync_target_repo() {
         git fetch --all --prune --tags -q
         local default_branch=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
         
-        # Ensure we are baseline synced on the default branch before branch branching
-        git checkout "$default_branch" -q
-        git pull origin "$default_branch" --rebase -q
+        # --- SAFE UPDATE WORKFLOW ---
+        if [ "$HAS_DRIFT" -eq 1 ]; then
+            echo "  -> Fast-forwarding local tracking structures with upstream..."
+            git checkout "$default_branch" -q
+            git pull origin "$default_branch" --rebase -q
+            
+            echo "  [💥] Re-applying your local modifications on top of current updates..."
+            if git stash pop -q; then
+                echo "  [✅] Workspace updated safely. Local modifications preserved."
+            else
+                echo "  [❌] Merge Conflict Detected! Keeping your work safe in stash registry."
+                echo "       Action Required: Resolve manually inside: $repo_path"
+            fi
+        else
+            # If the node is completely clean, it is safe to fast-forward the branch pointer directly
+            git checkout -B "$default_branch" "origin/$default_branch" -q
+            echo "  [✅] Node safely synchronized to fresh baseline state."
+        fi
 
         # --- ENHANCED COMPLIANCE WORKFLOW WITH AUTOMATED PR FALLBACK ---
-        # Look for global org rule presence or specific branch lockdowns
-        if gh ruleset list --org "$TARGET_ORG" 2>/dev/null | grep -q "active" || \
+        echo "  -> Evaluating server-side merge protection status..."
+        
+        # Check if direct push to the default branch is blocked by the active ruleset
+        if gh ruleset check --default 2>&1 | grep -q "Block force pushes" || \
            gh repo view "$TARGET_ORG/$name" --json defaultBranchRef | jq -r '.defaultBranchRef.name' &>/dev/null; then
             
+            # If branch protections are active, isolate modifications onto a standardized feature branch
             local feat_branch="feature/tcos-compliance-alignment"
-            echo "  [🛡️] Branch Protection Confirmed. Shifting to branch track: $feat_branch"
+            echo "  [🛡️] Branch Protection Confirmed. Shifting to track: $feat_branch"
             
-            # Delete old local feature track if it exists to stay pristine
-            git branch -D "$feat_branch" &>/dev/null || true
             git checkout -b "$feat_branch" -q
             
+            # If we had local changes, pop them safely onto the clean feature branch structure
             if [ "$HAS_DRIFT" -eq 1 ]; then
-                echo "  [💥] Re-applying your local modifications on top of compliance branch..."
-                if git stash pop -q; then
-                    git add README.md
-                    git commit -m "docs: align documentation with master TCOS blueprint" -q
-                    
-                    echo "  -> Publishing isolated tracking branch upstream..."
-                    git push origin "$feat_branch" --force -q
-                    
-                    echo "  -> Registering formal pull request across organization framework..."
-                    gh pr create --title "docs: align documentation with master TCOS blueprint" \
-                                 --body "Automated organizational documentation alignment sweep." \
-                                 --fill \
-                                 --repo "$TARGET_ORG/$name" -q || true
-                else
-                    echo "  [❌] Merge Conflict Encountered while popping stash to feature branch!"
-                fi
+                git stash pop -q
+                git add README.md
+                git commit -m "docs: align documentation with master TCOS blueprint" -q
+                
+                echo "  -> Publishing isolated tracking branch upstream..."
+                git push origin "$feat_branch" --force-with-lease -q
+                
+                # Automatically open a pull request into the mainline tracking trunk
+                echo "  -> Registering formal pull request across the organization framework..."
+                gh pr create --title "docs: align documentation with master TCOS blueprint" \
+                             --body "Automated organizational documentation alignment sweep." \
+                             --fill \
+                             --repo "$TARGET_ORG/$name" -q || true
             fi
         else
             # Fallback for standard unprotected sandbox environments if encountered
@@ -216,3 +230,4 @@ case "$MODE" in
         done
         ;;
 esac
+
