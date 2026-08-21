@@ -37,6 +37,15 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
   repo's org-default one. Only deletes **local checkout** files, does
   not commit/push — a human still has to do that per-repo.
 
+## External research
+
+- **`bin/survey-github-org.py OWNER`** — size up an unfamiliar GitHub
+  org/repo (identity/scale, governance, tooling signals, activity),
+  producing a filled report instead of raw API output. Implements
+  human-execution-engine's `EXTERNAL_SURVEY_METHODOLOGY.md`. `--top N`
+  controls how many repos get deep-inspected (default 8);
+  `--out FILE` writes the report to a file.
+
 ## Do not run without reading first
 
 - **`bin/bulk_org_repo_readme_update.bash`** — this is the script that
