@@ -20,11 +20,6 @@ Config schema:
   views:
     - name: Kanban
       layout: BOARD_LAYOUT   # TABLE_LAYOUT | BOARD_LAYOUT | ROADMAP_LAYOUT
-  fields:
-    - name: Date
-      dataType: DATE         # DATE | NUMBER | TEXT (SINGLE_SELECT not supported -- has its own option-list shape, add if actually needed)
-    - name: Effort
-      dataType: NUMBER
   items:
     - https://github.com/OWNER/REPO/issues/N
     - https://github.com/OWNER/REPO/pull/N
@@ -61,11 +56,6 @@ def get_project(owner: str, number: int) -> dict:
           id
           title
           views(first: 20) { nodes { id name layout } }
-          fields(first: 30) {
-            nodes {
-              ... on ProjectV2FieldCommon { id name dataType }
-            }
-          }
           items(first: 100) { nodes { id content { ... on Issue { url } ... on PullRequest { url } } } }
         }
       }
@@ -110,21 +100,6 @@ def apply_config(path: str):
         gh_graphql(q, projectId=project_id, name=view["name"], layout=view["layout"])
         print(f"  view '{view['name']}' ({view['layout']}): created")
 
-    existing_field_names = {f["name"] for f in live["fields"]["nodes"]}
-    for field in cfg.get("fields", []):
-        if field["name"] in existing_field_names:
-            print(f"  field '{field['name']}': already exists, skipping")
-            continue
-        q = """
-        mutation($projectId: ID!, $name: String!, $dataType: ProjectV2CustomFieldType!) {
-          createProjectV2Field(input: {projectId: $projectId, name: $name, dataType: $dataType}) {
-            projectV2Field { ... on ProjectV2FieldCommon { name dataType } }
-          }
-        }
-        """
-        gh_graphql(q, projectId=project_id, name=field["name"], dataType=field["dataType"])
-        print(f"  field '{field['name']}' ({field['dataType']}): created")
-
     existing_urls = {
         n["content"]["url"] for n in live["items"]["nodes"] if n.get("content") and n["content"].get("url")
     }
@@ -147,13 +122,6 @@ def dump_config(owner: str, number: int):
     cfg = {
         "project": {"owner": owner, "number": number, "title": live["title"]},
         "views": [{"name": v["name"], "layout": v["layout"]} for v in live["views"]["nodes"]],
-        "fields": [
-            {"name": f["name"], "dataType": f["dataType"]}
-            for f in live["fields"]["nodes"]
-            if f["name"] not in ("Title", "Assignees", "Status", "Labels", "Linked pull requests",
-                                  "Milestone", "Repository", "Reviewers", "Parent issue",
-                                  "Sub-issues progress", "Created", "Updated", "Closed")
-        ],
         "items": sorted(
             n["content"]["url"] for n in live["items"]["nodes"] if n.get("content") and n["content"].get("url")
         ),

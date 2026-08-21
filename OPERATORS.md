@@ -14,24 +14,25 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
   `dump OWNER NUMBER` to seed a YAML file from live state, `apply
   FILE` to sync it back (idempotent). Real run:
   [`examples/manage-project-roadmap.md`](examples/manage-project-roadmap.md).
-  Also manages custom **`fields:`** now (`DATE`/`NUMBER`/`TEXT` —
-  `SINGLE_SELECT` not supported yet, different mutation shape, add if
-  actually needed) — real run creating `Date`/`Effort` on the org's
-  `TCOS Roadmap` project in
-  [`examples/roadmap-fields-and-sync.md`](examples/roadmap-fields-and-sync.md).
 - **`bin/sync-roadmap-status.py OWNER NUMBER [--apply]`** — derives a
   Project item's time-bucket `Status` (`Near Future Todo` / `In
-  Future`) from its `Date` field instead of a human hand-flipping a
-  dropdown. Dry-run by default (reports what would change); `--apply`
-  writes it. Never touches `In Progress`/`Done` — completion state is a
-  human fact, a date doesn't imply it. Items with no `Date` set are
-  reported, not guessed at. `--threshold-days` (default 59) is a real
-  but **not yet confirmed** candidate — see
+  Future`) from the issue's real **`Target date`** field (a repo/org-
+  level Issue Type custom field, visible in the issue sidebar's
+  "Fields" section — a newer GitHub feature, distinct from a Projects
+  v2 custom field) instead of a human hand-flipping a dropdown.
+  Dry-run by default (reports what would change); `--apply` writes it.
+  Never touches `In Progress`/`Done` — completion state is a human
+  fact, a date doesn't imply it. Items with no `Target date` set are
+  reported, not guessed at; PRs are always out of scope (`Target date`
+  is Issues-only). `--threshold-days` (default 59) is a real but **not
+  yet confirmed** candidate — see
   [`roadmap`](https://github.com/Twin-Cities-Open-Systems/roadmap)'s
   README for the open near/far-boundary question this default is
-  standing in for. Real run, including a disposable write-path proof
-  that was cleaned up after itself:
-  [`examples/roadmap-fields-and-sync.md`](examples/roadmap-fields-and-sync.md).
+  standing in for. Real run, including a real mistake caught and fixed
+  before it stuck (an earlier version targeted the wrong field
+  entirely — Projects v2 custom fields, not the real Issue Type
+  fields Spencer was already using):
+  [`examples/sync-roadmap-status-output.md`](examples/sync-roadmap-status-output.md).
 
 ## Org-wide repo scripts
 
