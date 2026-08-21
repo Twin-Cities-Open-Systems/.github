@@ -8,10 +8,12 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
 
 - **`bin/create-epic.py`** — create a real Epic (issue + linked
   sub-issues + Project board entry) in one command. See the central
-  guide's worked example.
+  guide's worked example, or the real run in
+  [`examples/create-epic-operator-docs.md`](examples/create-epic-operator-docs.md).
 - **`bin/manage-project.py`** — declarative Project config.
   `dump OWNER NUMBER` to seed a YAML file from live state, `apply
-  FILE` to sync it back (idempotent).
+  FILE` to sync it back (idempotent). Real run:
+  [`examples/manage-project-roadmap.md`](examples/manage-project-roadmap.md).
 
 ## Org-wide repo scripts
 
@@ -44,7 +46,9 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
   producing a filled report instead of raw API output. Implements
   human-execution-engine's `EXTERNAL_SURVEY_METHODOLOGY.md`. `--top N`
   controls how many repos get deep-inspected (default 8);
-  `--out FILE` writes the report to a file.
+  `--out FILE` writes the report to a file. Real run, surveying
+  `pallets` (Flask's maintainers):
+  [`examples/survey-github-org-pallets.md`](examples/survey-github-org-pallets.md).
 
 ## Do not run without reading first
 
