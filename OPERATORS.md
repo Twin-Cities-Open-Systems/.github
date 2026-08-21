@@ -50,6 +50,25 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
   `pallets` (Flask's maintainers):
   [`examples/survey-github-org-pallets.md`](examples/survey-github-org-pallets.md).
 
+## Bulk PR review
+
+- **`bin/pr-review-console.sh [OWNER]`** — tmux console for reviewing
+  PRs across the whole org from a terminal instead of the GitHub
+  Android app. Two vertical panes: left lists every open PR needing
+  your review (falls back to all open PRs org-wide if none are
+  pending on `@me`); typing a number writes it to a shared state file,
+  which the right pane polls and re-renders full detail for
+  (title/state/+adds/-dels/body/diff). No `fzf` dependency — plain
+  numbered-list + `read`, works anywhere `tmux` + `gh` exist.
+  Pulls detail via `gh api repos/OWNER/REPO/pulls/NUM` (REST), not `gh
+  pr view`/`gh pr diff` — both of those `gh` subcommands hit a broken
+  GraphQL path (a deprecated Projects-Classic field,
+  `repository.pullRequest.projectCards`) that fails on most repos in
+  this org; REST doesn't touch that field. Per the central guide's
+  gh-first-then-fallback policy, this is the documented fallback, not
+  a permanent workaround — a `gh` CLI fix upstream would obsolete it.
+  Real run: [`examples/pr-review-console-output.md`](examples/pr-review-console-output.md).
+
 ## Do not run without reading first
 
 - **`bin/bulk_org_repo_readme_update.bash`** — this is the script that
