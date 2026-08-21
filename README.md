@@ -1,23 +1,16 @@
 # .github
 
-This repository is a verified component of the **Twin-Cities-Open-Systems (TCOS)** architecture.
+Twin-Cities-Open-Systems' org-wide governance/tooling repo — the
+global organizational controller and centralized configuration for
+the rest of the TCOS GitHub ecosystem.
 
-* **Ecosystem Role:** [Insert the precise Purpose we defined in the master index]
-* **Visibility Standard:** [Public | Private -> Public | Very Private]
-
----
-
-## 🛠️ Global Alignment & Invariants
-
-This codebase strictly adheres to the core engineering principles, scripting standards, and structural invariants mandated by the organization. 
-
-* **Scripting Guardrails:** All userland scripts (`.sh`, `.py`, `.awk`) inside this repository enforce the portable shebang syntax and a mandatory 4-line metadata header block.
-* **Terminology & Definitions:** Operational concepts, naming matrices, and architectural definitions match our centralized single source of truth.
-
-For complete compliance blueprints, operational roadmaps, and the global architecture manifest, refer back directly to the primary [TCOS Command Center Config](../.github).
-
----
-
-## 📜 Governance & Guidelines
-Contributions, architectural proposals, and documentation changes inside this node must follow our organizational frameworks. Review our global guidelines in the centralized [TCOS Glossary](../.github/blob/main/profile/GLOSSARY.md).
-
+- `profile/README.md` renders as the org's public profile page
+  (github.com/Twin-Cities-Open-Systems).
+- `profile/GLOSSARY.md` — the org's shared definitions/invariants.
+- `bin/` — org-wide scripts (repo sync/audit, CODEOWNERS centralization,
+  README maintenance, link/secret pre-commit hooks).
+- `.github/workflows/global-script-audit.yml` — reusable CI workflow
+  other repos can call in (header-format check, opt-in; unfilled
+  template-placeholder detection).
+- `.github/CODEOWNERS` — org-default fallback for repos that don't
+  define their own.
