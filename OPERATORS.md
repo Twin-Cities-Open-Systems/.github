@@ -69,6 +69,28 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
   a permanent workaround — a `gh` CLI fix upstream would obsolete it.
   Real run: [`examples/pr-review-console-output.md`](examples/pr-review-console-output.md).
 
+## Contract governance
+
+- **`bin/audit-contracts.py [--repo OWNER/REPO ...]`** — scans every real
+  `apiVersion: hee/v1`, `kind: Contract` file across the org (default:
+  `human-execution-engine` + `fleet-ops`) and reports which ones are
+  actually ratified vs. still need a vote. "Ratified" is verified, not
+  trusted: for anything claiming `status: ratified`, this checks that
+  the `.asc` GPG-signature file it names actually exists in the repo,
+  live via the API, not just that the pointer text reads correctly.
+  Classifies each into `RATIFIED_VERIFIED`, `RATIFIED_UNVERIFIED` (claims
+  ratified but the evidence file is missing — a real inconsistency),
+  `NEEDS_VOTE` (proposed), `NO_STATUS_FIELD` (not even declared
+  proposed), `OTHER_STATUS` (a different vocabulary, e.g. `completed` —
+  flagged for a human call rather than guessed at), and lists the older,
+  schema-different `contracts/*.contract.yaml` family (GPT/Oper/Relay
+  lane governance, no ratification concept) separately rather than
+  scoring them against a standard that was never theirs. First real run
+  immediately surfaced a genuine unratified `financial-authority`
+  contract that needed a vote — see
+  [`examples/audit-contracts-output.md`](examples/audit-contracts-output.md)
+  for the real output.
+
 ## Do not run without reading first
 
 - **`bin/bulk_org_repo_readme_update.bash`** — this is the script that
