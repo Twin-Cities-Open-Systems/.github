@@ -52,3 +52,6 @@ This index catalogs the active nodes across the TCOS platform. High-level summar
 
 ## 📜 Regulatory Governance & Compliance
 All codebases, userland utilities, and documentation entries across this organization must strictly conform to our global definitions, scripting headers, and data layout protocols. For complete implementation details, review the [TCOS Global Glossary & Invariant Declaration](https://github.com/Twin-Cities-Open-Systems/.github/blob/main/profile/GLOSSARY.md).
+
+## 🔌 Operational Continuity
+Work doesn't stop when an LLM session isn't available. The [Zero-Token Continuity Plan](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/blob/main/docs/guides/ZERO_TOKEN_CONTINUITY.md) is the real runbook for what already runs on plain, deterministic tooling -- no LLM call required.
