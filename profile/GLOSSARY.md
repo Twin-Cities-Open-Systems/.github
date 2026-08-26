@@ -1,7 +1,7 @@
 ---
 organization: Twin-Cities-Open-Systems
 version: 1.0.0
-last_updated: 2026-08-19
+last_updated: 2026-08-24
 type: Organizational-Invariant-Declaration
 ---
 
@@ -30,6 +30,14 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 ### Documentation Invariant
 * **Type:** Transparency Security Gate
 * **Invariant Standard:** No private structural details, operational API keys, specific vendor names, or target asset metrics may ever be written into the text descriptions of repositories marked as `(Private)` or `(Very Private)`. All private repository entries must use abstract operational language.
+
+### Opus
+* **Type:** Generated-Output Layer
+* **Invariant Standard:** The generated-outputs hierarchy and working surface for machine friends — rendered HTML, MD, YAML, text, EXIF, and image forms of cards, pills, contracts, plans, blueprints, and evidence. Refers strictly to *rendered/generated* output, never to source or authored content. Source of record: `human-execution-engine/hee/cards/hee-words.seed.card.v1.yaml`.
+
+### Corpus
+* **Type:** Inventory Concept — **Status: Thesis, not settled doctrine**
+* **Invariant Standard:** The whole real body of what actually exists in a given repo (or, extended, the org) — source and generated content alike. Distinct from Opus (which names the generated/rendered layer specifically): a Corpus is the larger whole an Opus is rendered from and lives inside. Real precedent: a top-level `CORPUS.md` "what actually exists here" index file, currently repo-scoped and unproven by design (`.github` and `human-execution-engine` only, per [`.github`#26](https://github.com/Twin-Cities-Open-Systems/.github/pull/26) and [`human-execution-engine`#251](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/pull/251), both open). If the thesis drifts stale faster than it's useful, it gets removed rather than kept as doctrine.
 
 ---
 
