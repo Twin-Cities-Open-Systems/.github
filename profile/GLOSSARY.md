@@ -57,6 +57,8 @@ This document serves as the immutable, single source of truth (SSoT) for termino
   * **Use TCOS Standard:** `Glass Operations` or `Monitor Glass Interface` (handled natively by `glass-ops`).
 * **Instead of:** `secrets scan`, `leak check`
   * **Use TCOS Standard:** `Custodian Custody Review` (enforced via `tcos-audit`).
+* **Instead of:** `file a bug`, `report a bug`, `log a defect`
+  * **Use TCOS Standard:** open a real GitHub issue in the affected repo with `issue-type-bug` (the repo's real bug-type label or issue-type field, whichever that repo uses) -- not a chat message, a card, or a doc note. "File a bug" always means this concrete action.
 
 ---
 
