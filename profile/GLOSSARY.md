@@ -19,6 +19,10 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Legal-entity form:** In any public-facing context that needs the legal entity, not just the org name, use `Twin Cities Open Systems (TCOS), LLC` or the short form `TCOS (LLC)`. Authority for the entity's real identifiers (EIN, filing details, formation dates) lives in `tcos-plan-private`, never here.
 * **Identifier redaction (real invariant, not just a style note):** EIN, tax IDs, and legacy/superseded entity identifiers must never appear in this repo or any other public-facing surface -- state that they're tracked privately instead of naming or partially redacting them.
 
+### TCOS Private Enterprise Number (PEN)
+* **Type:** Real, externally-registered technical identifier
+* **Invariant Standard:** TCOS's real IANA-assigned Private Enterprise Number is **66550**, registered to "Twin Cities Open Systems - Operations LLC." Unlike an EIN or tax ID, a PEN is meant to be public -- it's the base OID arc (`1.3.6.1.4.1.66550`) any TCOS tooling uses when it needs a real, globally-unique identifier (SNMP MIBs, X.509 extensions, or similar namespaced metadata). Independently verifiable at any time against IANA's own registry: `https://www.iana.org/assignments/enterprise-numbers.txt`. Never invent or guess a substitute number -- 66550 is the one real, assigned value.
+
 ### Pedigree
 * **Type:** Organizational Paradigm
 * **Invariant Standard:** Refers exclusively to the proven track record, core credentials, and structural lineage of system owners or foundational intellectual property within the `human-execution-engine`.
@@ -44,6 +48,7 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 | **PII** | Personally Identifiable Information | `tcos-audit` |
 | **IP** | Intellectual Property | `tcos-plan-private` / `thesis-engine` |
 | **SSoT** | Single Source of Truth | Global Platform |
+| **PEN** | Private Enterprise Number (IANA-assigned) | Global Platform |
 
 ---
 
