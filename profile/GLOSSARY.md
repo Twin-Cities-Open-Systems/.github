@@ -47,6 +47,11 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Type:** Culture Term — **Status: Stub, pending Spencer's review, not settled**
 * **Invariant Standard (draft):** Hacker-culture sense only — real, fast, hands-on building/tinkering/improving on a real machine (e.g. "raising the tempo on hacking kiosk," 2026-08-26). Never the intrusion/exploitation sense. Drafted as a stub per Spencer's direct instruction ("a stub I will review as p2") rather than a full canonized entry — content here is provisional until he reviews it.
 
+### Block
+* **Type:** Governance Action
+* **Invariant Standard:** To block an Issue or PR means submitting a real, GitHub-native `gh pr review --request-changes` with the concrete technical reason documented in the review body -- never just a comment saying "don't merge," which carries no real enforcement and can be scrolled past. On any repo with `required_approving_review_count >= 1` (check via `gh api repos/<owner>/<repo>/branches/<branch>/protection`), a `CHANGES_REQUESTED` review decision actively disables the merge button for a normal merge -- verify the block landed via `gh pr view <n> --json reviewDecision`, don't just trust the command exited clean. Real precedent: [thesis-engine#15](https://github.com/Twin-Cities-Open-Systems/thesis-engine/pull/15), blocked 2026-08-26 with the exact `npm ci` failure output in the review body, not a vague objection. Note the real limit, honestly: `enforce_admins: false` on most repos in this org means an admin can still force-merge past a block -- the review makes the objection real and visible, it doesn't make bypass impossible, and bypassing a documented block is a deliberate act, not an accident.
+* **Not the same as**: closing an Issue/PR (ends it), a `wontfix`/`invalid` label (a status, not an active gate), or a plain comment (no enforcement).
+
 ### Documentation Invariant
 * **Type:** Transparency Security Gate
 * **Invariant Standard:** No private structural details, operational API keys, specific vendor names, or target asset metrics may ever be written into the text descriptions of repositories marked as `(Private)` or `(Very Private)`. All private repository entries must use abstract operational language.
