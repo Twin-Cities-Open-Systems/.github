@@ -56,6 +56,14 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Type:** Org-Wide State
 * **Invariant Standard:** The real, org-wide pre-condition for a tagged release -- CI clean across repos, real backlog fields filled (Type/Priority/Effort, per HEE Policy §18), no stale/cruft issues, open PRs at or near zero. Not a per-repo CI status color (that's just "passing"/"failing") -- Green names the whole-org state itself. Fits the org's own established 🔴🟡🟢 status-dot convention rather than inventing new vocabulary. Canonized 2026-08-26, Spencer: "green it is," coined in his own words earlier the same session ("so close to being fully green and stable, then we can do tagged release").
 
+### Heuristics
+* **Type:** Practice/Method
+* **Invariant Standard:** Real, named judgment-call reasoning used when full independent verification isn't possible -- checking internal consistency and plausibility (does the content match what a real instance of this thing should look like) rather than asserting confirmation that doesn't exist. Real precedent, 2026-08-26: verifying [inbound#13](https://github.com/Twin-Cities-Open-Systems/inbound/issues/13) (a real application submission) by checking whether the name/email were plausible and whether the body content read as a genuine message vs. placeholder text ("Qwerty / Wizzy wig") -- not claiming identity was confirmed, since it wasn't, just reporting what the heuristic actually showed and flagging the gap explicitly ("I can't independently verify identity from a name+email alone"). The discipline is in the honesty: heuristics narrow uncertainty, they don't manufacture certainty -- state which one you got, never claim the other.
+
+### Gloss It Up
+* **Type:** Meta/Process Term
+* **Invariant Standard:** The real verb for adding a new term to this glossary -- coined by Spencer in the act of doing it ("what they call heuristics, add to gloss / 'gloss it up'"), self-referential by design (glossary -> gloss it up). Every real entry in this document should be grounded in a concrete, dated precedent from an actual session, not an abstract definition invented in isolation -- that's been true of every entry canonized 2026-08-26 (Ratify, Hacking, Block, Green, Heuristics) and is the real standard "gloss it up" names going forward.
+
 ### Documentation Invariant
 * **Type:** Transparency Security Gate
 * **Invariant Standard:** No private structural details, operational API keys, specific vendor names, or target asset metrics may ever be written into the text descriptions of repositories marked as `(Private)` or `(Very Private)`. All private repository entries must use abstract operational language.
