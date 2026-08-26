@@ -35,6 +35,10 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Type:** Architectural Layer
 * **Invariant Standard:** Refers strictly to bare-metal hardware monitor displays managed by `glass-ops`. Never use to describe cloud dashboards or web-based frontend browser views.
 
+### Logic Loop
+* **Type:** Governance Failure Mode
+* **Invariant Standard:** A rule that still reads as active, absolute policy on paper but has no real bearing on actual practice -- either because practice quietly diverged from it, or because it was never actually enforced. Named for the shape of the failure: the rule points at itself ("this is the policy") without a live edge back to real behavior, so it loops rather than governs. Real, confirmed instances, found 2026-08-26 auditing `docs/doctrine/HEE_POLICY.md` after a heavy merge session: §2 (Branch Management Policy) requires `feature/`-prefixed branch names deleted immediately post-merge -- real practice is 71 `touchy/`-prefixed branches kept post-merge as an audit trail, vs. 5 real `feature/` branches, and `touchy/` is undocumented anywhere; §6 (Command Safety Policy) requires `bash -n` syntax validation "for all shell commands" -- not actually run before most one-off commands in real sessions. Confirmed, Spencer directly: §§1-6 read as legacy/template boilerplate predating the fleet's real established practice, not live-authored policy like §7 onward. Per the Canonization Policy (`docs/doctrine/HEE_POLICY.md` §19): finding a logic loop means surfacing the tension and getting a real human call on which side wins -- formalize practice into doctrine, or start actually enforcing the written rule -- never silently picking one or leaving it unremarked.
+
 ### Documentation Invariant
 * **Type:** Transparency Security Gate
 * **Invariant Standard:** No private structural details, operational API keys, specific vendor names, or target asset metrics may ever be written into the text descriptions of repositories marked as `(Private)` or `(Very Private)`. All private repository entries must use abstract operational language.
