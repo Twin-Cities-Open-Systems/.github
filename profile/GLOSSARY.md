@@ -23,6 +23,10 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Type:** Real, externally-registered technical identifier
 * **Invariant Standard:** TCOS's real IANA-assigned Private Enterprise Number is **66550**, registered to "Twin Cities Open Systems - Operations LLC." Unlike an EIN or tax ID, a PEN is meant to be public -- it's the base OID arc (`1.3.6.1.4.1.66550`) any TCOS tooling uses when it needs a real, globally-unique identifier (SNMP MIBs, X.509 extensions, or similar namespaced metadata). Independently verifiable at any time against IANA's own registry: `https://www.iana.org/assignments/enterprise-numbers.txt`. Never invent or guess a substitute number -- 66550 is the one real, assigned value.
 
+### Determinism
+* **Type:** Core Execution Principle
+* **Invariant Standard:** One of `human-execution-engine`'s three explicit top-level priorities, stated directly in its own README: "correctness over consensus, structure over vibes, **determinism over convenience**." Means the same real inputs produce the same real outputs and the same real decisions, reproducibly -- not "usually," not "close enough." Concretely enforced today as **deterministic identity** (doctrine objects use a `seed` + derived `id`, never a randomly-assigned one, so identity survives re-runs and stays auditable/merge-safe) and **deterministic scheduling/orchestration** (work is scheduled and evaluated by explicit rules, not left to incidental ordering). Real, heavily-used term across the codebase -- not aspirational language.
+
 ### Pedigree
 * **Type:** Organizational Paradigm
 * **Invariant Standard:** Refers exclusively to the proven track record, core credentials, and structural lineage of system owners or foundational intellectual property within the `human-execution-engine`.
