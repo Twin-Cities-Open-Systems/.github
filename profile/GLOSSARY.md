@@ -43,6 +43,10 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Type:** Governance Action
 * **Invariant Standard:** The real verb for a Contract moving from `status: proposed` to `status: ratified` -- an authorized OPER's real GPG signature, never a GitHub approve-click (self-approval can't be enforced when proposer and approver share an account) and never a majority vote. Covers both flows that produce this outcome: the per-contract path (`tools/hee/ratify-contract.sh`, documented in the `ratify-contract-v1` Skill) and the batch/mass-decision path (`hee-contract-review --action sign`, which loops every `status: proposed` contract in priority order for the same real signature). "Sign" names the mechanical GPG act inside that flow; "ratify" names the governance outcome it produces -- use "ratify" when describing what happened to the contract, "sign" only when describing the specific GPG step. Never "promote" -- that verb is already real and distinct (`deploy.sh promote`, lab-to-prod deployment) and using it for contracts collides with that meaning. Never "vote" -- HEE contract ratification is single-authorized-signer verification, not multi-party consensus; "vote" implies a mechanism the system doesn't have. Canonized 2026-08-26, Spencer: "yes, canonize."
 
+### Hacking
+* **Type:** Culture Term — **Status: Stub, pending Spencer's review, not settled**
+* **Invariant Standard (draft):** Hacker-culture sense only — real, fast, hands-on building/tinkering/improving on a real machine (e.g. "raising the tempo on hacking kiosk," 2026-08-26). Never the intrusion/exploitation sense. Drafted as a stub per Spencer's direct instruction ("a stub I will review as p2") rather than a full canonized entry — content here is provisional until he reviews it.
+
 ### Documentation Invariant
 * **Type:** Transparency Security Gate
 * **Invariant Standard:** No private structural details, operational API keys, specific vendor names, or target asset metrics may ever be written into the text descriptions of repositories marked as `(Private)` or `(Very Private)`. All private repository entries must use abstract operational language.
