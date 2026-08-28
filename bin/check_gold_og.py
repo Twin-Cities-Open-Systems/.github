@@ -91,6 +91,20 @@ def extract_markup(path: str) -> str:
     return extract_markup_from_text(text, is_python=path.endswith(".py"))
 
 
+def component_score(markup: str) -> tuple:
+    """Simple math: (present, total) across every individual Gold/OG
+    check -- a quick completeness score alongside the pass/fail detail."""
+    checks = [
+        GOLD_ACCENT_LIGHT_RE, GOLD_ACCENT_DARK_RE, GOLD_SANS_RE, GOLD_MONO_RE,
+        GOLD_PREPAINT_RE, GOLD_LU_ROW_RE, GOLD_LU_ISO_RE,
+    ]
+    checks += list(GOLD_THEME_TOGGLE_RES.values())
+    checks += list(GOLD_FONTSIZE_TOGGLE_RES.values())
+    checks += [pattern for _, pattern in REQUIRED_META]
+    present = sum(1 for pattern in checks if pattern.search(markup))
+    return present, len(checks)
+
+
 def check_file_from_markup(markup: str) -> list:
     """Returns a list of plain-text failure strings for this markup --
     empty list means it passed. Never encodes pass/fail as color alone
@@ -153,14 +167,15 @@ def main(argv: list) -> int:
 
     any_failed = False
     for path in argv:
-        failures = check_file(path)
+        markup = extract_markup(path)
+        failures = check_file_from_markup(markup)
+        present, total = component_score(markup)
+        status = "FAIL" if failures else "PASS"
         if failures:
             any_failed = True
-            print(f"FAIL {path}")
-            for f in failures:
-                print(f"  - {f}")
-        else:
-            print(f"PASS {path}")
+        print(f"{status} {path} ({present}/{total} components)")
+        for f in failures:
+            print(f"  - {f}")
 
     return 1 if any_failed else 0
 

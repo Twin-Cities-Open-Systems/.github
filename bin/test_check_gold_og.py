@@ -93,6 +93,17 @@ class TestOGCompleteness(unittest.TestCase):
         self.assertEqual(og_failures, [])
 
 
+class TestComponentScore(unittest.TestCase):
+    def test_full_pass_scores_perfect(self):
+        present, total = cgo.component_score(GOOD_HTML)
+        self.assertEqual(present, total)
+
+    def test_bare_html_scores_zero(self):
+        present, total = cgo.component_score(BARE_HTML)
+        self.assertEqual(present, 0)
+        self.assertGreater(total, 0)
+
+
 class TestPyTemplateExtraction(unittest.TestCase):
     def test_extracts_triple_quoted_page_head(self):
         py_source = (
