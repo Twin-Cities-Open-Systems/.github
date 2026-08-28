@@ -94,3 +94,9 @@ sites:
   - url: https://spencer.media.lab.tcos.us/
     repo: resume
     note: real, live -- lab-side mirror, path-rewritten onto be_view's webroot per haproxy.cfg
+  - url: https://lab.tcos.us/
+    repo: tcos-www
+    note: "real, live -- Step 1 of the clone plan, 2026-08-28: bare apex is now a real dedicated haproxy route (real mirror of tcos-www), not the accidental default_backend be_view fallback it had before. Deployed via .github's Makefile (`hee make lab-tcos-www`)."
+  - url: https://spencer.blog.lab.tcos.us/
+    repo: resume
+    note: "real, live -- Step 1 of the clone plan, 2026-08-28: same real path-rewrite pattern as spencer.media.lab.tcos.us. Deployed via .github's Makefile (`hee make lab-blog`)."
