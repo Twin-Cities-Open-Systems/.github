@@ -1,0 +1,101 @@
+# profile/SITEMAP-PROPOSED.yaml
+#
+# NOT a real inventory -- see profile/SITEMAP.yaml for that. This is
+# the real *target structure*: the hostname/path pattern the org is
+# converging on, defined once so new subdomains/pages have an obvious
+# shape to follow instead of each one being invented ad hoc.
+#
+# Real trigger (2026-08-28): defining the real lab.tcos.us <-> tcos.us
+# sync rule surfaced a second, related question -- what shape do NEW
+# *.tcos.us hostnames take as the org adds people/services. Spencer's
+# real answer, his own words: "{<agent>|<oper>}.{blog,media,foo}[.lab]?
+# .tcos.us" -- clean slug paths only, "no /page.ext just the slug, no
+# .html or ugly shit".
+#
+# The real regex (hostname AND path) lives in one place, not copied
+# here or anywhere else that consumes it:
+#   human-execution-engine/library/py/hee_hostmap (HOSTNAME_RE, APEX_RE,
+#   PATH_SLUG_RE, classify_host(), is_clean_path())
+
+apex:
+  rule: "lab.tcos.us == tcos.us"
+  status: >
+    NOT yet real. Bare lab.tcos.us resolves and returns 200 today, but
+    only by accident -- no dedicated haproxy ACL/backend exists for
+    it, so it falls through to default_backend be_view and serves
+    view's content, not tcos-www's.
+  action_required: >
+    a real, dedicated haproxy ACL + backend for the bare lab.tcos.us
+    Host header, serving tcos-www's real content, once Step 1 of the
+    clone plan deploys it -- replacing the accidental be_view
+    fallback, not layering on top of it.
+
+pattern:
+  shape: "{person}.{service}[.lab].tcos.us"
+  person:
+    required: false
+    covers: >
+      both an Oper name (e.g. spencer) and an Agent name (e.g.
+      touchy-claude) -- the DNS label alone can't and shouldn't try to
+      distinguish which; that classification belongs in SITEMAP
+      metadata, not the hostname.
+    real_example: spencer.media.tcos.us
+  services:
+    - name: blog
+      repo: resume
+      real_today:
+        - spencer.blog.tcos.us
+      lab_mirror: "MAY -- not yet real, spencer.blog.lab.tcos.us isn't in the lab zone yet"
+    - name: media
+      repo: resume
+      real_today:
+        - spencer.media.tcos.us
+      lab_mirror: "MAY -- already real, spencer.media.lab.tcos.us exists"
+    - name: foo
+      repo: unknown
+      real_today:
+        - foo.tcos.us  # bare, no person prefix -- the shared dogfood slot, tenant rotates
+      lab_mirror: >
+        not planned -- foo.tcos.us runs on separate DigitalOcean
+        infra (159.65.46.8), outside the pve/haproxy stack this
+        pattern otherwise governs.
+  expansion: >
+    add a new service by adding one name to human-execution-engine's
+    hee_hostmap.SERVICES set -- never hand-edit a regex to add one.
+
+lab_only_no_mirror_expected:
+  # real *.lab.tcos.us subdomains today (pve/haproxy/haproxy.cfg,
+  # /etc/bind/zones/db.lab.tcos.us) that are lab-internal tooling, not
+  # a "MAY" mirror candidate -- this asymmetry is correct by design,
+  # not a gap to fill in later.
+  - ns1
+  - bastion
+  - haproxy
+  - view
+  - thesis-engine
+  - owner-dogfood
+  - container-factory
+  - lab-to-prod-deploy
+  - mx1  # MX record, not a web host at all
+
+excluded_entirely:
+  # real hosts that will never match this pattern -- not an error,
+  # just outside its scope
+  - rtfm.tcos.us  # external DO infra, abandoned, being scrubbed
+  - man.tcos.us   # external DO infra, kept as-is (also real Gopher content)
+
+paths:
+  rule: "clean slugs only -- no file extension, no trailing '/index.html' ugliness"
+  validator: human-execution-engine/library/py/hee_hostmap.is_clean_path
+  examples:
+    good:
+      - /
+      - /contracts
+      - /people/spencer
+    bad:
+      - /contracts.html
+      - /index.html
+      - /tux-tattoo/
+  known_violation: >
+    spencer.media.tcos.us/tux-tattoo/ -- real trailing slash, already
+    tracked in .github#47, not yet fixed.
