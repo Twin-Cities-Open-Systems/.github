@@ -1,2 +1,10 @@
 __pycache__/
 *.pyc
+
+# todo.html -- real, live, lab-only (view.lab.tcos.us/todo.html, "stays
+# lab-only, never promoted to prod" per profile/SITEMAP.yaml), hand-edited
+# directly on the view container (pve vmid 107, /www/todo.html). No source
+# of record exists here by design (.github#42, still open) -- ignored
+# rather than left untracked-by-accident, so a future local copy never
+# silently drifts from the live file.
+todo.html
