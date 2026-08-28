@@ -1,2 +1,17 @@
 __pycache__/
 *.pyc
+
+# view.lab.tcos.us's 8 real, live, hand-authored pages (pve vmid 107,
+# /www/*.html) -- all still real per profile/SITEMAP.yaml, all cite the
+# same "no source of record yet" gap (.github#42, still open). Ignored
+# rather than left untracked-by-accident, so a future local copy never
+# silently drifts from the live file. Confirmed 2026-08-28 via a real
+# `find /www -maxdepth 1 -iname '*.html'` on the container.
+index.html
+roadmap.html
+review.html
+follow-up.html
+ian.html
+todo.html
+plan.html
+contracts.html

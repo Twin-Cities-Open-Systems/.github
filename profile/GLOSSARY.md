@@ -85,6 +85,12 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Type:** Role — **Human-Rights Party**
 * **Invariant Standard:** The human-rights party, paired with `Agent` (the machine-rights party) -- see that entry for the full rule and canonization citation. Already real, pre-existing usage across the org before this pairing was made explicit (`SRO` = *Single Responsible Operator*; `hee_git_ops.sh`'s own comments distinguish agent mutation gating from human/oper action) -- this entry doesn't introduce the word, it canonizes the distinction it draws against `Agent`.
 
+### Gold
+* **Type:** Design/UX System
+* **Invariant Standard:** The real UX/UI system originated on `view.lab.tcos.us` (og:site_name literally "TCOS View") -- teal accent (`#0d7d78` light / `#3fd4c8` dark), IBM Plex Sans (body) + JetBrains Mono (mono/labels), light/dark/auto toggle defaulting dark, card-based `section`/`.link-card` layout. Named for what everyone was already calling it in real conversation, 2026-08-28: "view.lab is the gold standard." Canonized as the org's adopted default for reskinning any real surface -- concrete precedent: resume#32 (blog-hub.html/media-hub.html) and fleet-ops#330 (foo/man gopher pages) both ported off it verbatim, replacing an unrelated green-terminal look. Distinct from `tcos-www`'s own separate `tc-shell`/`tc-grid`/`tc-theme` system (amber accent, no named webfont) -- the two are not yet reconciled; see the still-open question of whether tcos-www itself adopts Gold.
+* **Not the same as**: `Opus` (the generated-output layer), or "gold standard" used as a plain English phrase elsewhere -- capitalized `Gold` names this specific design system.
+* **Naming convention, established here**: a real design system's font pairing is its defining, identifying signature -- Gold *is* "IBM Plex Sans - JetBrains Mono" (Spencer, direct, 2026-08-28: "this is the name... the next one will follow suite in future"). `check_gold_og.py`'s font check already treats this as the adoption signal, not just a style detail. Any future named system in this org should be identified the same way: by its own font pairing, not a generic label.
+
 ---
 
 ## 2. Acronym Expander
