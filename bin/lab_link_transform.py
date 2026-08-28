@@ -39,7 +39,7 @@ import shutil
 import sys
 from pathlib import Path
 
-REAL_PAGES = ["people", "activity", "story", "ir", "careers", "contact"]
+REAL_PAGES = ["people", "activity", "story", "ir", "careers", "contact", "contracts"]
 
 _LINK_RE = re.compile(
     r'href="/(' + "|".join(REAL_PAGES) + r')(\?[^"]*)?"'

@@ -15,7 +15,7 @@ from lab_link_transform import transform_html
 class TestTransformHtml(unittest.TestCase):
 
     def test_rewrites_known_pages(self):
-        for page in ["people", "activity", "story", "ir", "careers", "contact"]:
+        for page in ["people", "activity", "story", "ir", "careers", "contact", "contracts"]:
             html = f'<a href="/{page}">x</a>'
             self.assertEqual(transform_html(html), f'<a href="/{page}.html">x</a>')
 
