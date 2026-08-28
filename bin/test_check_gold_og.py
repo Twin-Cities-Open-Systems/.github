@@ -5,6 +5,8 @@
 # fixtures for both the Gold-adherence checks and the OG-completeness
 # checks, plus the .py embedded-template extraction path.
 
+import os
+import tempfile
 import unittest
 
 import check_gold_og as cgo
@@ -102,6 +104,33 @@ class TestComponentScore(unittest.TestCase):
         present, total = cgo.component_score(BARE_HTML)
         self.assertEqual(present, 0)
         self.assertGreater(total, 0)
+
+
+class TestLocalStylesheetFollowing(unittest.TestCase):
+    def test_follows_local_stylesheet_for_tokens(self):
+        # Real case, tcos-www: accent tokens live in an external
+        # css/site.css, not an inline <style> block. The checker must
+        # follow a local (non-http) stylesheet link, not just fail
+        # forever on a real, legitimate architecture difference.
+        with tempfile.TemporaryDirectory() as d:
+            css_path = os.path.join(d, "site.css")
+            with open(css_path, "w") as f:
+                f.write(":root { --accent: #0d7d78; } .dark { --accent: #3fd4c8; }")
+            html_no_inline_accent = GOOD_HTML.replace("#0d7d78", "").replace("#3fd4c8", "")
+            html_no_inline_accent = html_no_inline_accent.replace(
+                "<style>", '<link rel="stylesheet" href="site.css"><style>'
+            )
+            html_path = os.path.join(d, "page.html")
+            with open(html_path, "w") as f:
+                f.write(html_no_inline_accent)
+            self.assertEqual(cgo.check_file(html_path), [])
+
+    def test_ignores_remote_stylesheet_links(self):
+        markup = GOOD_HTML.replace(
+            "<style>", '<link rel="stylesheet" href="https://fonts.googleapis.com/x"><style>'
+        )
+        # Should not raise or try to fetch a URL -- remote links are skipped.
+        cgo.check_file_from_markup(markup)
 
 
 class TestPyTemplateExtraction(unittest.TestCase):

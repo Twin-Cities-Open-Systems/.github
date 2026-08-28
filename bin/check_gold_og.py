@@ -8,6 +8,7 @@
 # Python parse -- this only needs the literal markup, not the runtime
 # f-string interpolation around it.
 
+import os
 import re
 import sys
 
@@ -85,10 +86,35 @@ def extract_markup_from_text(text: str, is_python: bool) -> str:
     return text
 
 
+LOCAL_STYLESHEET_RE = re.compile(r'<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"[^>]*>')
+
+
+def inline_local_stylesheets(markup: str, base_dir: str) -> str:
+    """Some real Gold ports (tcos-www) use one external css/site.css for
+    every page rather than an inline <style> block per page -- real,
+    legitimate architecture, not a mistake. Append any local (non-http)
+    linked stylesheet's content so token/font checks still see it,
+    instead of permanently missing tokens that are real but off-page."""
+    extra = []
+    for href in LOCAL_STYLESHEET_RE.findall(markup):
+        if href.startswith("http://") or href.startswith("https://"):
+            continue
+        css_path = os.path.join(base_dir, href)
+        if os.path.isfile(css_path):
+            with open(css_path, encoding="utf-8", errors="replace") as f:
+                extra.append(f.read())
+    return markup + "\n".join(extra)
+
+
 def extract_markup(path: str) -> str:
-    """Path-reading wrapper around extract_markup_from_text."""
-    text = open(path, encoding="utf-8", errors="replace").read()
-    return extract_markup_from_text(text, is_python=path.endswith(".py"))
+    """Path-reading wrapper around extract_markup_from_text, also pulling
+    in any local linked stylesheet's content (see inline_local_stylesheets)."""
+    with open(path, encoding="utf-8", errors="replace") as f:
+        text = f.read()
+    markup = extract_markup_from_text(text, is_python=path.endswith(".py"))
+    if not path.endswith(".py"):
+        markup = inline_local_stylesheets(markup, os.path.dirname(os.path.abspath(path)))
+    return markup
 
 
 def component_score(markup: str) -> tuple:
