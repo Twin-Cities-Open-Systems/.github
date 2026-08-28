@@ -144,12 +144,26 @@ def get_diff_html(repo: str, path: str, new: bool) -> str:
     return '<pre class="diff">' + "\n".join(lines) + "</pre>"
 
 
-def get_pretty_html(repo: str, path: str) -> str:
+# Comment prefix per real file extension -- used only to prepend a real
+# source-comment (see get_pretty_html's github_url param), never guessed
+# per-language beyond this simple, real mapping.
+_COMMENT_PREFIX_BY_EXT = {
+    ".yaml": "#", ".yml": "#", ".py": "#", ".sh": "#", ".toml": "#",
+    ".js": "//", ".ts": "//", ".rs": "//", ".go": "//", ".c": "//", ".java": "//",
+}
+
+
+def get_pretty_html(repo: str, path: str, github_url: str | None = None) -> str:
     full = Path(repo) / path
     try:
         text = full.read_text(encoding="utf-8")
     except (FileNotFoundError, UnicodeDecodeError, IsADirectoryError, OSError) as e:
         return f'<p class="empty">Can\'t render: {html.escape(str(e))}</p>'
+
+    if github_url and not path.endswith(".md"):
+        ext = Path(path).suffix
+        prefix = _COMMENT_PREFIX_BY_EXT.get(ext, "#")
+        text = f"{prefix} source: {github_url}\n\n{text}"
 
     if path.endswith(".md") and _markdown is not None:
         # codehilite gives fenced code blocks the same real pygments
@@ -727,6 +741,13 @@ DEFAULT_BROWSE_SUBDIRS_BY_REPO = {
 }
 
 
+GITHUB_ORG = "Twin-Cities-Open-Systems"  # real org name -- used to build real
+# https://github.com/<org>/<repo>/blob/main/<path> source-comment links in
+# pretty-printed output. All 4 repos this tool handles are confirmed on
+# `main` (checked via `gh api repos/<org>/<repo> --jq .default_branch`,
+# 2026-08-27) -- not assumed.
+
+
 def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: str):
     repo_name = real_repo_name(repo)
     safe_repo = repo_name.lstrip(".") or repo_name
@@ -735,7 +756,8 @@ def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: s
     license_info = detect_license(repo)
     for path in iter_tree_files(repo, subdirs):
         diff_html = get_diff_html(repo, path, new=False)
-        pretty_html = get_pretty_html(repo, path)
+        github_url = f"https://github.com/{GITHUB_ORG}/{safe_repo}/blob/main/{path}"
+        pretty_html = get_pretty_html(repo, path, github_url=github_url)
         commit_info = get_commit_info(repo, path, is_new=False)
         og_url = f"https://view.lab.tcos.us/files/{safe_repo}/{path}.html"
         page = PAGE_TEMPLATE.format(
