@@ -8,6 +8,7 @@
 # Python parse -- this only needs the literal markup, not the runtime
 # f-string interpolation around it.
 
+import os
 import re
 import sys
 
@@ -41,6 +42,23 @@ GOLD_THEME_TOGGLE_RES = {
 # copied verbatim across every real port so far.
 GOLD_PREPAINT_RE = re.compile(r'localStorage\.getItem\("tcos-theme"\)')
 
+# Font-size toggle (S/M/L/XL/XXL) and the lu: freshness row -- real,
+# required Gold components, not optional extras. Missed on the first 4
+# real ports (resume#32, fleet-ops#330); caught live, 2026-08-28:
+# "should all be together, how miss? make not happen again." Gold is a
+# bundle of interchangeable components (Spencer, direct) -- every
+# component gets its own check here so a partial port fails loudly
+# instead of silently shipping "close enough."
+GOLD_FONTSIZE_TOGGLE_RES = {
+    "s": re.compile(r'data-size="s"'),
+    "m": re.compile(r'data-size="m"'),
+    "l": re.compile(r'data-size="l"'),
+    "xl": re.compile(r'data-size="xl"'),
+    "xxl": re.compile(r'data-size="xxl"'),
+}
+GOLD_LU_ROW_RE = re.compile(r'class="lu-row"')
+GOLD_LU_ISO_RE = re.compile(r'class="lu-iso"')
+
 # Full OG set, per view.lab.tcos.us's own <head> (the reference instance).
 # canonical + meta description travel with OG in practice even though
 # they're not technically part of the OG spec -- real precedent is to
@@ -68,10 +86,49 @@ def extract_markup_from_text(text: str, is_python: bool) -> str:
     return text
 
 
+LOCAL_STYLESHEET_RE = re.compile(r'<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"[^>]*>')
+
+
+def inline_local_stylesheets(markup: str, base_dir: str) -> str:
+    """Some real Gold ports (tcos-www) use one external css/site.css for
+    every page rather than an inline <style> block per page -- real,
+    legitimate architecture, not a mistake. Append any local (non-http)
+    linked stylesheet's content so token/font checks still see it,
+    instead of permanently missing tokens that are real but off-page."""
+    extra = []
+    for href in LOCAL_STYLESHEET_RE.findall(markup):
+        if href.startswith("http://") or href.startswith("https://"):
+            continue
+        css_path = os.path.join(base_dir, href)
+        if os.path.isfile(css_path):
+            with open(css_path, encoding="utf-8", errors="replace") as f:
+                extra.append(f.read())
+    return markup + "\n".join(extra)
+
+
 def extract_markup(path: str) -> str:
-    """Path-reading wrapper around extract_markup_from_text."""
-    text = open(path, encoding="utf-8", errors="replace").read()
-    return extract_markup_from_text(text, is_python=path.endswith(".py"))
+    """Path-reading wrapper around extract_markup_from_text, also pulling
+    in any local linked stylesheet's content (see inline_local_stylesheets)."""
+    with open(path, encoding="utf-8", errors="replace") as f:
+        text = f.read()
+    markup = extract_markup_from_text(text, is_python=path.endswith(".py"))
+    if not path.endswith(".py"):
+        markup = inline_local_stylesheets(markup, os.path.dirname(os.path.abspath(path)))
+    return markup
+
+
+def component_score(markup: str) -> tuple:
+    """Simple math: (present, total) across every individual Gold/OG
+    check -- a quick completeness score alongside the pass/fail detail."""
+    checks = [
+        GOLD_ACCENT_LIGHT_RE, GOLD_ACCENT_DARK_RE, GOLD_SANS_RE, GOLD_MONO_RE,
+        GOLD_PREPAINT_RE, GOLD_LU_ROW_RE, GOLD_LU_ISO_RE,
+    ]
+    checks += list(GOLD_THEME_TOGGLE_RES.values())
+    checks += list(GOLD_FONTSIZE_TOGGLE_RES.values())
+    checks += [pattern for _, pattern in REQUIRED_META]
+    present = sum(1 for pattern in checks if pattern.search(markup))
+    return present, len(checks)
 
 
 def check_file_from_markup(markup: str) -> list:
@@ -103,6 +160,20 @@ def check_file_from_markup(markup: str) -> list:
     if not GOLD_PREPAINT_RE.search(markup):
         failures.append("Gold theme system: missing pre-paint script (no-flash localStorage read)")
 
+    missing_fontsize = [
+        size for size, pattern in GOLD_FONTSIZE_TOGGLE_RES.items()
+        if not pattern.search(markup)
+    ]
+    if missing_fontsize:
+        failures.append(
+            "Gold font-size toggle: missing size(s) " + ", ".join(missing_fontsize)
+        )
+
+    if not GOLD_LU_ROW_RE.search(markup):
+        failures.append("Gold lu: row: missing (class=\"lu-row\")")
+    if not GOLD_LU_ISO_RE.search(markup):
+        failures.append("Gold lu: row: missing timestamp (class=\"lu-iso\")")
+
     for label, pattern in REQUIRED_META:
         if not pattern.search(markup):
             failures.append(f"OG: missing {label}")
@@ -122,14 +193,15 @@ def main(argv: list) -> int:
 
     any_failed = False
     for path in argv:
-        failures = check_file(path)
+        markup = extract_markup(path)
+        failures = check_file_from_markup(markup)
+        present, total = component_score(markup)
+        status = "FAIL" if failures else "PASS"
         if failures:
             any_failed = True
-            print(f"FAIL {path}")
-            for f in failures:
-                print(f"  - {f}")
-        else:
-            print(f"PASS {path}")
+        print(f"{status} {path} ({present}/{total} components)")
+        for f in failures:
+            print(f"  - {f}")
 
     return 1 if any_failed else 0
 

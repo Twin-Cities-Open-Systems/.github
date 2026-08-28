@@ -31,7 +31,7 @@ lab-tcos-www:
 	bin/lab_link_transform.py $(TCOS_WWW) /tmp/lab-deploy-tcos-www-src
 	mkdir -p /tmp/lab-deploy-tcos-www
 	cd /tmp/lab-deploy-tcos-www-src && tar -czf /tmp/lab-deploy-tcos-www/site.tar.gz \
-		activity.html careers.html contact.html index.html ir.html people.html story.html \
+		activity.html careers.html contact.html contracts.html index.html ir.html people.html story.html \
 		css js shell
 	scp /tmp/lab-deploy-tcos-www/site.tar.gz pve:/tmp/tcos-www-static.tar.gz
 	ssh pve "pct push $(VIEW_VMID) /tmp/tcos-www-static.tar.gz /tmp/tcos-www-static.tar.gz && \
