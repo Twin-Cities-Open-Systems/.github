@@ -88,6 +88,20 @@ def extract_markup_from_text(text: str, is_python: bool) -> str:
 
 LOCAL_STYLESHEET_RE = re.compile(r'<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"[^>]*>')
 
+# Linked local <script> files -- checked separately from inline markup
+# (see check_linked_theme_js) because the exact bug this catches lives
+# in JS behavior, not HTML presence: tcos-www's shell/tc-theme.js had
+# the right data-theme-choice buttons in markup (already passed every
+# check above) but read the wrong JS property (dataset.theme instead
+# of dataset.themeChoice), so every click was a silent no-op. Found
+# 2026-08-28 by diffing against the real reference implementation
+# (.github/bin/render-review.py, this same file) directly -- a
+# markup-only checker structurally cannot catch this class of bug.
+LOCAL_SCRIPT_RE = re.compile(r'<script[^>]+src="([^"]+)"[^>]*>')
+THEME_BTN_RE = re.compile(r'\.theme-btn\b')
+DATASET_THEME_CHOICE_RE = re.compile(r'dataset\.themeChoice\b')
+DATASET_THEME_WRONG_RE = re.compile(r'dataset\.theme\b(?!Choice)')
+
 
 def inline_local_stylesheets(markup: str, base_dir: str) -> str:
     """Some real Gold ports (tcos-www) use one external css/site.css for
@@ -115,6 +129,42 @@ def extract_markup(path: str) -> str:
     if not path.endswith(".py"):
         markup = inline_local_stylesheets(markup, os.path.dirname(os.path.abspath(path)))
     return markup
+
+
+def check_linked_theme_js(markup: str, base_dir: str) -> list:
+    """Real, separate check (not folded into check_file_from_markup's
+    markup-only checks): any locally-linked <script> that implements the
+    theme toggle (has a real .theme-btn handler) must read
+    dataset.themeChoice, matching render-review.py's reference
+    implementation -- not dataset.theme, the exact hand-copy bug found
+    2026-08-28 in tcos-www's shell/tc-theme.js. A page can correctly
+    show data-theme-choice="light/dark/auto" buttons (passing every
+    check above) while the JS wired to them is silently broken -- this
+    is the only check in this file that can catch that."""
+    failures = []
+    for href in LOCAL_SCRIPT_RE.findall(markup):
+        if href.startswith("http://") or href.startswith("https://"):
+            continue
+        js_path = os.path.join(base_dir, href)
+        if not os.path.isfile(js_path):
+            continue
+        with open(js_path, encoding="utf-8", errors="replace") as f:
+            js = f.read()
+        if not THEME_BTN_RE.search(js):
+            continue  # this script doesn't implement the theme toggle at all
+        if DATASET_THEME_WRONG_RE.search(js):
+            failures.append(
+                f"Gold theme JS ({href}): reads dataset.theme instead of "
+                "dataset.themeChoice -- matches tcos-www's exact 2026-08-28 "
+                "hand-copy bug, theme clicks would be a silent no-op"
+            )
+        elif not DATASET_THEME_CHOICE_RE.search(js):
+            failures.append(
+                f"Gold theme JS ({href}): has .theme-btn handling but never "
+                "reads dataset.themeChoice -- doesn't match the reference "
+                "implementation, verify by hand"
+            )
+    return failures
 
 
 def component_score(markup: str) -> tuple:
@@ -182,8 +232,15 @@ def check_file_from_markup(markup: str) -> list:
 
 
 def check_file(path: str) -> list:
-    """Path-reading wrapper around check_file_from_markup."""
-    return check_file_from_markup(extract_markup(path))
+    """Path-reading wrapper around check_file_from_markup, plus the
+    linked-theme-JS check (needs base_dir, so it can't live in the
+    markup-only path -- see check_linked_theme_js)."""
+    failures = check_file_from_markup(extract_markup(path))
+    if not path.endswith(".py"):
+        with open(path, encoding="utf-8", errors="replace") as f:
+            raw_markup = f.read()
+        failures += check_linked_theme_js(raw_markup, os.path.dirname(os.path.abspath(path)))
+    return failures
 
 
 def main(argv: list) -> int:

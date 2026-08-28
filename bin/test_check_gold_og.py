@@ -133,6 +133,59 @@ class TestLocalStylesheetFollowing(unittest.TestCase):
         cgo.check_file_from_markup(markup)
 
 
+class TestLinkedThemeJs(unittest.TestCase):
+    # Real regression, 2026-08-28: tcos-www's shell/tc-theme.js had
+    # correct data-theme-choice buttons in markup (passed every check
+    # above) but read dataset.theme instead of dataset.themeChoice, so
+    # every theme click was a silent no-op. check_file_from_markup alone
+    # is structurally blind to this -- only check_file (which follows
+    # the linked script to disk) can catch it.
+
+    def _html_with_script(self, script_href):
+        return GOOD_HTML.replace(
+            "<style>", f'<script src="{script_href}"></script><style>'
+        )
+
+    def test_flags_the_real_2026_08_28_regression(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "tc-theme.js"), "w") as f:
+                f.write(
+                    'document.querySelectorAll(".theme-btn").forEach(function(b){'
+                    ' b.addEventListener("click", function(){ var t = b.dataset.theme; }); });'
+                )
+            html_path = os.path.join(d, "page.html")
+            with open(html_path, "w") as f:
+                f.write(self._html_with_script("tc-theme.js"))
+            failures = cgo.check_file(html_path)
+            self.assertTrue(any("dataset.theme instead of dataset.themeChoice" in f for f in failures))
+
+    def test_passes_the_real_reference_implementation(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "tc-theme.js"), "w") as f:
+                f.write(
+                    'document.querySelectorAll(".theme-btn").forEach(function(b){'
+                    ' b.addEventListener("click", function(){ var t = b.dataset.themeChoice; }); });'
+                )
+            html_path = os.path.join(d, "page.html")
+            with open(html_path, "w") as f:
+                f.write(self._html_with_script("tc-theme.js"))
+            self.assertEqual(cgo.check_file(html_path), [])
+
+    def test_ignores_scripts_that_dont_implement_theme_toggle(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "site.js"), "w") as f:
+                f.write('document.querySelectorAll(".fontsize-btn").forEach(function(b){});')
+            html_path = os.path.join(d, "page.html")
+            with open(html_path, "w") as f:
+                f.write(self._html_with_script("site.js"))
+            self.assertEqual(cgo.check_file(html_path), [])
+
+    def test_ignores_remote_scripts(self):
+        markup = self._html_with_script("https://example.com/x.js")
+        # Should not raise or try to fetch a URL.
+        cgo.check_file_from_markup(cgo.extract_markup_from_text(markup, is_python=False))
+
+
 class TestPyTemplateExtraction(unittest.TestCase):
     def test_extracts_triple_quoted_page_head(self):
         py_source = (
