@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
+# Spencer Butler <dev@tcos.us>
+# init-org-foundation.sh
+# One-time org bootstrap generator, frozen 2026-08-27 -- content below is stale.
+
 set -e
+
+# This script's heredocs (profile/README.md, ARCHITECTURE.md, WORKFLOW.md --
+# the last of which no longer exists as a file, superseded by
+# PROMPTING_RULES.md + profile/ORG_SETUP.md) are frozen at an earlier point
+# in the docs' evolution and would silently overwrite the current, real
+# versions with stale/short ones -- the exact failure shape of the
+# 2026-08-20/21 README-wipe incident this org already got burned by. Refusing
+# to run unless explicitly overridden.
+if [ "${TCOS_ALLOW_STALE_BOOTSTRAP:-0}" != "1" ]; then
+    echo "[BLOCKED] init-org-foundation.sh is a frozen, stale generator." >&2
+    echo "          It would overwrite current docs with outdated content." >&2
+    echo "          Set TCOS_ALLOW_STALE_BOOTSTRAP=1 to run it anyway." >&2
+    exit 1
+fi
 
 echo "🚀 Overhauling TCOS command center profiles and architecture..."
 
