@@ -47,9 +47,10 @@ sites:
   - url: https://foo.tcos.us/
     repo: unknown
     note: "real, live -- confirmed 2026-08-28: the real generic-POC dogfood slot. Standing role is to always host whatever idea/product/service is currently being dogfooded -- the tenant changes, the role doesn't. Real tenant/private-plan detail intentionally not recorded here -- see internal tracking instead."
-  - url: https://rtfm.tcos.us/
-    repo: unknown
-    note: "confirmed 2026-08-28: real, but abandoned -- Spencer may revisit later, scrub for now (real TLS cert mismatch found this session, not worth fixing on something being scrubbed)."
+  # rtfm.tcos.us -- killed 2026-08-28: real Cloudflare A record
+  # (159.65.46.8) deleted via the API, confirmed gone against
+  # Cloudflare's own authoritative nameserver. No longer real, entry
+  # removed (was: "abandoned, real TLS cert mismatch, scrub for now").
   - url: https://man.tcos.us/
     repo: unknown
     note: "confirmed 2026-08-28: real, kept as-is -- also serves real Gopher content, not just HTTP. Spencer: keep the real content/functionality exactly as it is, just blend its HTTP presentation into the new TCOS design system (site-bar, theme, etc.) -- do not touch the Gopher side."
