@@ -74,7 +74,16 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 
 ### Corpus
 * **Type:** Inventory Concept — **Status: Thesis, not settled doctrine**
-* **Invariant Standard:** The whole real body of what actually exists in a given repo (or, extended, the org) — source and generated content alike. Distinct from Opus (which names the generated/rendered layer specifically): a Corpus is the larger whole an Opus is rendered from and lives inside. Real precedent: a top-level `CORPUS.md` "what actually exists here" index file, currently repo-scoped and unproven by design (`.github` and `human-execution-engine` only, per [`.github`#26](https://github.com/Twin-Cities-Open-Systems/.github/pull/26) and [`human-execution-engine`#251](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/pull/251), both open). If the thesis drifts stale faster than it's useful, it gets removed rather than kept as doctrine.
+* **Invariant Standard:** The whole real body of what actually exists in a given repo (or, extended, the org) — source and generated content alike. Distinct from Opus (which names the generated/rendered layer specifically): a Corpus is the larger whole an Opus is rendered from and lives inside. Real precedent, tested in two repos, one result each: `.github`'s top-level `CORPUS.md` (proposed [`.github`#26](https://github.com/Twin-Cities-Open-Systems/.github/pull/26)) drifted into near-total duplication of that repo's own `README.md`/`OPERATORS.md` and was removed as part of the 2026-08-27 instruction-set consolidation, per this thesis's own stated exit condition -- exactly the "if it drifts stale faster than it's useful, remove it" case. `human-execution-engine`'s `CORPUS.md` (proposed [`human-execution-engine`#251](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/pull/251)) is still open and, unlike the removed copy, points at real auto-generated indexes (`docs/THESIS_INDEX.md`, `docs/history/PILL_INDEX.md`) it doesn't itself duplicate -- unproven, not yet judged either way.
+
+### Agent
+* **Type:** Role — **Machine-Rights Party**
+* **Invariant Standard:** The machine-rights party in any process/documentation prose that distinguishes who is doing something -- as opposed to `Oper`, the human-rights party. Same shape of rule as the org's existing "no vendor names in generic docs" convention (say `agent`, never `claude`/`Claude Code`/etc., in generic prose) -- extended one level further: generic, unqualified "agent(s)" language that's actually trying to distinguish a human from a machine is itself now imprecise; use the real pair (`agent`/`Oper`) instead. Vendor-neutral naming in code/config/identity labels (preferring `agent` over a vendor-specific name) is a separate, unaffected concern at a different layer -- see `docs/DOCUMENTATION_POLICY.md` rule 2, which this entry sharpens into a concrete required pair rather than just a prohibition. Canonized 2026-08-27, Spencer: "similar to 'no vendors' no 'agents' in generic documentation or process. prefer agent(machineRights) oper(humanRights)."
+* **Not the same as**: the dead `COG`/`OPER`/`AGENT` three-role split that used to live in `human-execution-engine`'s `docs/doctrine/FROZEN_CONTRACTS.md` (removed 2026-08-27 as dead vocabulary matching nothing in real practice) or the equally-dead two-role `AGENT`/`OPERATOR` split from the same repo's `HEE_EXECUTION_ATTRIBUTION.md` (also removed) -- both used "AGENT" to mean something else (a party that never executes, or one role among three), not the machine-rights party this entry defines. This is a real, live, deliberately re-introduced pair, not a revival of either dead one.
+
+### Oper
+* **Type:** Role — **Human-Rights Party**
+* **Invariant Standard:** The human-rights party, paired with `Agent` (the machine-rights party) -- see that entry for the full rule and canonization citation. Already real, pre-existing usage across the org before this pairing was made explicit (`SRO` = *Single Responsible Operator*; `hee_git_ops.sh`'s own comments distinguish agent mutation gating from human/oper action) -- this entry doesn't introduce the word, it canonizes the distinction it draws against `Agent`.
 
 ---
 
@@ -90,6 +99,19 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 | **IP** | Intellectual Property | `tcos-plan-private` / `thesis-engine` |
 | **SSoT** | Single Source of Truth | Global Platform |
 | **PEN** | Private Enterprise Number (IANA-assigned) | Global Platform |
+| **SRO** | Single Responsible Operator -- one named human (Spencer Butler) has sole approval authority for a given scope, no committee/multi-party vote. Currently the real authority model for `human-execution-engine`'s CI governance rules (`docs/governance/operations/GOVERNANCE_OPERATIONS.md`) | `human-execution-engine` |
+| **RFC** | Request for Comment -- an open question needing real discussion before action, not yet a decision. Real doc type (`docs/rfc/`, per `docs/DOCUMENTATION_POLICY.md`) and a real GitHub label, both in active use | `human-execution-engine` |
+
+Added 2026-08-27 (SRO, RFC) after a real sweep of the core doctrine files
+prompted by Spencer catching `SRO` undefined mid-review. **Not resolved by
+that sweep**: `HEER` appears three times in `HEE_POLICY.md` §4/§7 with no
+expansion anywhere in the repo -- those sections are part of the same
+generic/undated authorial-voice pattern already flagged as suspect (unlike
+§2/§6, not yet confirmed as drifted-from-practice, so not silently
+rewritten or removed here) -- needs a real answer from Spencer, not an
+invented one. This wasn't an exhaustive audit of every acronym in every
+file org-wide, just the core always-loaded doctrine set — a wider sweep is
+still open (see `view.lab.tcos.us/follow-up.html` #6).
 
 ---
 

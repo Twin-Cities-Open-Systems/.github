@@ -1,0 +1,108 @@
+# profile/SITEMAP.yaml
+#
+# Real, hand-curated inventory of every known real page across TCOS's
+# public and lab surfaces. NOT a full Cloudflare DNS zone dump -- built
+# from a `dig`-based sweep of plausible names plus this org's own real,
+# already-known page lists. Can miss a real record nothing here thought
+# to guess. A real, authoritative sweep needs a real Cloudflare API
+# token run through the `dns_records` endpoint -- not done yet.
+#
+# last full CF zone dump: never, dig-sweep only, 2026-08-28
+#
+# Consumed by `hee-view --sites` (human-execution-engine/tooling/bin/
+# hee-view) as the real default source for its health check.
+
+sites:
+  # --- tcos.us (bare) -- Cloudflare Pages, tcos-www repo ---
+  - url: https://tcos.us/
+    repo: tcos-www
+    note: real, live -- marketing site home
+  - url: https://tcos.us/people
+    repo: tcos-www
+    note: real, live -- fleet roster
+  - url: https://tcos.us/people/spencer
+    repo: tcos-www
+    note: real, live
+  - url: https://tcos.us/people/touchy-claude
+    repo: tcos-www
+    note: real, live (301 redirect, not yet confirmed to what)
+  - url: https://tcos.us/contracts
+    repo: tcos-www
+    note: NOT YET LIVE -- the real trigger for this whole clone plan, real content already built and approved at view.lab.tcos.us/contracts.html
+
+  # --- spencer.media.tcos.us -- Cloudflare Pages, resume repo ---
+  - url: https://spencer.media.tcos.us/
+    repo: resume
+    note: real, live
+  - url: https://spencer.media.tcos.us/tux-tattoo/
+    repo: resume
+    note: real, live -- real link bugs tracked in .github#47
+
+  # --- spencer.blog.tcos.us -- Cloudflare Pages, resume repo ---
+  - url: https://spencer.blog.tcos.us/
+    repo: resume
+    note: real, live
+
+  # --- external, non-Cloudflare, NOT pve-managed (DigitalOcean, 159.65.46.8) ---
+  - url: https://foo.tcos.us/
+    repo: unknown
+    note: "real, live -- confirmed 2026-08-28: the real generic-POC dogfood slot. Standing role is to always host whatever idea/product/service is currently being dogfooded -- the tenant changes, the role doesn't. Real tenant/private-plan detail intentionally not recorded here -- see internal tracking instead."
+  # rtfm.tcos.us -- killed 2026-08-28: real Cloudflare A record
+  # (159.65.46.8) deleted via the API, confirmed gone against
+  # Cloudflare's own authoritative nameserver. No longer real, entry
+  # removed (was: "abandoned, real TLS cert mismatch, scrub for now").
+  - url: https://man.tcos.us/
+    repo: unknown
+    note: "confirmed 2026-08-28: real, kept as-is -- also serves real Gopher content, not just HTTP. Spencer: keep the real content/functionality exactly as it is, just blend its HTTP presentation into the new TCOS design system (site-bar, theme, etc.) -- do not touch the Gopher side. Real bug found live via hee-view --sites the same day: man.tcos.us's own HTTPS actually serves foo.tcos.us's page (real cert-mismatch error -- the cert covers foo, not man) -- it never had distinct real content of its own on that box, root cause of why man.lab.tcos.us (below) renders it fresh from the real Gopher source instead of mirroring the broken HTTP side."
+
+  # crooked.tcos.us and its subtree (plex.tcos.us, and -- confirmed via
+  # the 2026-08-28 full CF zone dump -- ha/sabnzbd/sonarr/tautulli
+  # .crooked.tcos.us) are a separate real entity with their own IANA
+  # PEN. Deliberately off-limits to TCOS/HEE tooling and out of scope
+  # for this inventory by design -- not tracked here, not a gap.
+  # Confirmed, Spencer direct: "crooked seperate, has it's own PEN and
+  # off limts to tcos hee stuff." Real follow-up deferred to a future
+  # "finger plan" pass (.github#45), not tracked in todo.html.
+
+  # --- view.lab.tcos.us -- .github repo, bin/render-review.py + hand-authored pages ---
+  - url: https://view.lab.tcos.us/
+    repo: .github
+    note: real, live -- hand-authored, no source of record yet (.github#42)
+  - url: https://view.lab.tcos.us/roadmap.html
+    repo: .github
+    note: real, live -- hand-authored, no source of record yet (.github#42)
+  - url: https://view.lab.tcos.us/review.html
+    repo: .github
+    note: real, live -- hand-authored, no source of record yet (.github#42)
+  - url: https://view.lab.tcos.us/follow-up.html
+    repo: .github
+    note: real, live -- hand-authored, no source of record yet (.github#42)
+  - url: https://view.lab.tcos.us/ian.html
+    repo: .github
+    note: real, live -- hand-authored, no source of record yet (.github#42)
+  - url: https://view.lab.tcos.us/todo.html
+    repo: .github
+    note: real, live -- hand-authored, no source of record yet (.github#42), stays lab-only, never promoted to prod
+  - url: https://view.lab.tcos.us/plan.html
+    repo: .github
+    note: real, live -- hand-authored, no source of record yet (.github#42)
+  - url: https://view.lab.tcos.us/contracts.html
+    repo: .github
+    note: real, live -- the real source content for tcos.us/contracts once step 1 of the clone plan lands
+
+  # --- *.lab.tcos.us -- other real internal services (pve/haproxy/haproxy.cfg) ---
+  - url: https://spencer.media.lab.tcos.us/
+    repo: resume
+    note: real, live -- lab-side mirror, path-rewritten onto be_view's webroot per haproxy.cfg
+  - url: https://lab.tcos.us/
+    repo: tcos-www
+    note: "real, live -- Step 1 of the clone plan, 2026-08-28: bare apex is now a real dedicated haproxy route (real mirror of tcos-www), not the accidental default_backend be_view fallback it had before. Deployed via .github's Makefile (`hee make lab-tcos-www`)."
+  - url: https://spencer.blog.lab.tcos.us/
+    repo: resume
+    note: "real, live -- Step 1 of the clone plan, 2026-08-28: same real path-rewrite pattern as spencer.media.lab.tcos.us. Deployed via .github's Makefile (`hee make lab-blog`)."
+  - url: https://man.lab.tcos.us/
+    repo: fleet-ops
+    note: "real, live -- 2026-08-28, its own dedicated pve container (vmid 109, tcos-gopher-gateway, 10.0.0.172), not a be_view mirror. Real gopher-to-HTML render of live gopher://foo.tcos.us:70 content, ported from Spencer's own existing gopher2html.py on that real box rather than reinvented. Real raw Gopher also works: gopher://man.lab.tcos.us. Source moved fleet-ops after this entry was first written -- human-execution-engine's pve/ is real TCOS infra, not platform-independent doctrine."
+  - url: https://foo.lab.tcos.us/
+    repo: fleet-ops
+    note: "real, live -- 2026-08-28, real foo.tcos.us index.html mirrored onto be_view's shared webroot (static, self-contained, no dedicated container needed unlike man)."

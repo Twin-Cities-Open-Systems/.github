@@ -1,0 +1,60 @@
+name: "Real Lab Deploy Tools Check"
+
+# Real trigger (2026-08-28, Spencer): "should have ci job that make
+# sure it all works" -- after the first hand-run of the *.tcos.us ->
+# lab.tcos.us deploy process missed a real asset directory (css/js),
+# this formalizes what CI can actually, honestly verify.
+#
+# Real scope limit: the actual deploy targets (lab-tcos-www, lab-blog)
+# need real SSH access to pve + the view container -- CI has no real
+# credentials for that, and shouldn't (deploying to real lab infra
+# from an automated PR run is its own real risk). What this job DOES
+# verify: the pure logic (lab_link_transform.py's real link rewriting)
+# via real unit tests, and that the Makefile/hee-make wrapper itself
+# is syntactically sound via a real dry run (`make -n`) -- catches a
+# broken target/typo before it's discovered live, without touching
+# real infra.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Makefile"
+      - "bin/lab_link_transform.py"
+      - "bin/test_lab_link_transform.py"
+      - "tooling/bin/hee-make"
+  pull_request:
+    paths:
+      - "Makefile"
+      - "bin/lab_link_transform.py"
+      - "bin/test_lab_link_transform.py"
+      - "tooling/bin/hee-make"
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    name: "Real unit tests + Makefile dry run"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Real unit tests -- lab_link_transform.py"
+        run: python3 -m unittest discover -s bin -p "test_*.py" -v
+
+      - name: "Real dry run -- lab-tcos-www, lab-blog (make -n, no real infra touched)"
+        run: |
+          make -n lab-tcos-www
+          make -n lab-blog
+
+      - name: "Real hee-make usage check (no-args exits 1, doesn't hang)"
+        run: |
+          chmod +x tooling/bin/hee-make
+          if tooling/bin/hee-make; then
+            echo "FAIL: hee-make with no args should exit non-zero"
+            exit 1
+          fi

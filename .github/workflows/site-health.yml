@@ -1,0 +1,47 @@
+name: "Real Site Health"
+
+# Real trigger (2026-08-28, Spencer): "let's know what we publish" +
+# fleet-ops#295's own recommendation that "declaring a pipeline exists"
+# means a real checked-in Actions workflow, not a chat claim. Runs
+# human-execution-engine's real hee-view --sites against this repo's
+# own real profile/SITEMAP.yaml, on a real schedule and on any push
+# that touches the sitemap itself.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  push:
+    branches: [main]
+    paths:
+      - "profile/SITEMAP.yaml"
+  workflow_dispatch: {}
+
+jobs:
+  check-sites:
+    name: "hee-view --sites"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout .github (real site map)"
+        uses: actions/checkout@v4
+        with:
+          path: dot-github
+
+      - name: "Checkout human-execution-engine (real hee-view tool)"
+        uses: actions/checkout@v4
+        with:
+          repository: Twin-Cities-Open-Systems/human-execution-engine
+          path: human-execution-engine
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Install PyYAML"
+        run: pip install pyyaml
+
+      - name: "Run hee-view --sites against the real site map"
+        run: |
+          python3 human-execution-engine/tooling/bin/hee-view \
+            --sites --nerd \
+            --sitemap dot-github/profile/SITEMAP.yaml
