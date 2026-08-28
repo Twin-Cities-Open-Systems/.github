@@ -43,6 +43,38 @@ class TestTransformHtml(unittest.TestCase):
         expected = '<a href="/contact.html?apply=ceo&amp;title=Chief%20Executive%20Officer">Apply</a>'
         self.assertEqual(transform_html(html), expected)
 
+    def test_rewrites_cross_domain_person_link(self):
+        # Real bug, confirmed live 2026-08-28: lab.tcos.us/people.html
+        # pointed at spencer.media.tcos.us (prod) instead of the real
+        # spencer.media.lab.tcos.us mirror.
+        html = '<a href="https://spencer.media.tcos.us">Media</a>'
+        expected = '<a href="https://spencer.media.lab.tcos.us">Media</a>'
+        self.assertEqual(transform_html(html), expected)
+
+    def test_rewrites_cross_domain_link_with_path(self):
+        html = '<a href="https://spencer.blog.tcos.us/some-post">Post</a>'
+        expected = '<a href="https://spencer.blog.lab.tcos.us/some-post">Post</a>'
+        self.assertEqual(transform_html(html), expected)
+
+    def test_leaves_already_lab_domain_alone(self):
+        html = '<a href="https://spencer.media.lab.tcos.us">Media</a>'
+        self.assertEqual(transform_html(html), html)
+
+    def test_leaves_non_tcos_domains_alone(self):
+        html = '<a href="https://github.com/Twin-Cities-Open-Systems">GitHub</a>'
+        self.assertEqual(transform_html(html), html)
+
+    def test_rewrites_multiple_cross_domain_links(self):
+        html = (
+            '<a href="https://spencer.blog.tcos.us">Blog</a>'
+            '<a href="https://spencer.media.tcos.us">Media</a>'
+        )
+        expected = (
+            '<a href="https://spencer.blog.lab.tcos.us">Blog</a>'
+            '<a href="https://spencer.media.lab.tcos.us">Media</a>'
+        )
+        self.assertEqual(transform_html(html), expected)
+
 
 if __name__ == "__main__":
     unittest.main()
