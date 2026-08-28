@@ -14,8 +14,10 @@
 #
 # The real regex (hostname AND path) lives in one place, not copied
 # here or anywhere else that consumes it:
-#   human-execution-engine/library/py/hee_hostmap (HOSTNAME_RE, APEX_RE,
-#   PATH_SLUG_RE, classify_host(), is_clean_path())
+#   human-execution-engine/library/py/hee_hostmap (APEX_RE,
+#   PATH_SLUG_RE, classify_host(), is_clean_path()). classify_host()
+#   matches <service> generically (any DNS label) -- there is no
+#   enumerated service list in code to keep in sync with this file.
 
 apex:
   rule: "lab.tcos.us == tcos.us"
@@ -59,9 +61,21 @@ pattern:
         not planned -- foo.tcos.us runs on separate DigitalOcean
         infra (159.65.46.8), outside the pve/haproxy stack this
         pattern otherwise governs.
+    - name: man
+      repo: unknown
+      real_today:
+        - man.tcos.us  # bare, no person prefix -- also real Gopher content, untouched
+      lab_mirror: >
+        not planned -- same external DigitalOcean infra as foo, kept
+        as-is; only the HTTP presentation blends into the new design
+        system, per Spencer's real instruction.
   expansion: >
-    add a new service by adding one name to human-execution-engine's
-    hee_hostmap.SERVICES set -- never hand-edit a regex to add one.
+    <service> matches any real DNS label generically -- hee_hostmap
+    has no enumerated service list in code to edit. Adding a real
+    service is a pure data change, one new entry under services:
+    above -- never a regex/code change. Real correction, Spencer
+    direct, 2026-08-28: an earlier version of hee_hostmap hardcoded
+    an alternation of known names, which was exactly backwards.
 
 lab_only_no_mirror_expected:
   # real *.lab.tcos.us subdomains today (pve/haproxy/haproxy.cfg,
@@ -78,11 +92,21 @@ lab_only_no_mirror_expected:
   - lab-to-prod-deploy
   - mx1  # MX record, not a web host at all
 
-excluded_entirely:
-  # real hosts that will never match this pattern -- not an error,
-  # just outside its scope
-  - rtfm.tcos.us  # external DO infra, abandoned, being scrubbed
-  - man.tcos.us   # external DO infra, kept as-is (also real Gopher content)
+decommissioned:
+  # real hosts that used to be live and were intentionally killed --
+  # they still match the pattern's shape (hee_hostmap classifies
+  # syntax, not realness), they're just gone now.
+  - name: rtfm.tcos.us
+    killed: 2026-08-28
+    reason: >
+      abandoned, real TLS cert mismatch found this session, not worth
+      fixing. Real Cloudflare A record (159.65.46.8) deleted via the
+      API (zone f7653a2322319cb118516b533d12a564), confirmed gone
+      against Cloudflare's own authoritative nameserver, not just a
+      local dig result.
+  # bofh.tcos.us: real, live-checked 2026-08-28 -- never had a DNS
+  # record in this zone. Nothing to kill; not listed above because it
+  # was never real to begin with, not because it was removed.
 
 paths:
   rule: "clean slugs only -- no file extension, no trailing '/index.html' ugliness"
