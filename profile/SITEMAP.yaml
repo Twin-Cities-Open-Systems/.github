@@ -106,3 +106,9 @@ sites:
   - url: https://foo.lab.tcos.us/
     repo: fleet-ops
     note: "real, live -- 2026-08-28, real foo.tcos.us index.html mirrored onto be_view's shared webroot (static, self-contained, no dedicated container needed unlike man)."
+  - url: https://blog.lab.tcos.us/
+    repo: resume
+    note: "real, live -- 2026-08-28, category-level hub (blog-hub.html, 'every operator' list), real haproxy ACL+backend from fleet-ops#329. Missing from this inventory until now -- confirmed 200 via curl --resolve, added retroactively."
+  - url: https://media.lab.tcos.us/
+    repo: resume
+    note: "real, live -- 2026-08-28, category-level hub (media-hub.html, 'every operator' list), real haproxy ACL+backend from fleet-ops#329. Missing from this inventory until now -- confirmed 200 via curl --resolve, added retroactively."

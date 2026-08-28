@@ -47,12 +47,32 @@ pattern:
       repo: resume
       real_today:
         - spencer.blog.tcos.us
-      lab_mirror: "MAY -- not yet real, spencer.blog.lab.tcos.us isn't in the lab zone yet"
+      lab_mirror: "MAY -- already real, spencer.blog.lab.tcos.us exists (corrected 2026-08-28, was stale)"
+      hub:
+        shape: "{service}[.lab].tcos.us (no person prefix)"
+        meaning: >
+          Distinct from the person-optional case above (a single
+          shared resource like foo/man): this is a real directory/
+          aggregator page listing every operator's own instance, not
+          a specific person's content. Real today, both prod and lab
+          -- confirmed live 2026-08-28 (resume#31/#32).
+        real_today:
+          - blog.tcos.us
+          - blog.lab.tcos.us
     - name: media
       repo: resume
       real_today:
         - spencer.media.tcos.us
       lab_mirror: "MAY -- already real, spencer.media.lab.tcos.us exists"
+      hub:
+        shape: "{service}[.lab].tcos.us (no person prefix)"
+        meaning: >
+          Same hub/aggregator distinction as blog's hub entry above.
+          Real today, both prod and lab -- confirmed live 2026-08-28
+          (resume#31/#32).
+        real_today:
+          - media.tcos.us
+          - media.lab.tcos.us
     - name: foo
       repo: unknown
       real_today:
