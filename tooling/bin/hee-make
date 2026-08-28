@@ -1,0 +1,21 @@
+#!/bin/sh
+# hee-make -- thin wrapper so this repo's real Makefile targets
+# (lab, lab-tcos-www, lab-blog, lab-verify, release) are callable the
+# same way as every other hee-* tool: `hee make <target>`.
+#
+# Real trigger (2026-08-28): Spencer, direct: "should wrap like ./hee
+# -make {env,dotfiles,release,foo,bar}" -- the real ./hee dispatcher
+# only supports space-separated subcommands (hee <cmd>), not
+# dash-flags, so this becomes `hee make <target>` -- the same
+# extension mechanism every other hee-<cmd> already uses.
+set -eu
+
+SELF_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+REPO_ROOT="$(cd "${SELF_DIR}/../.." 2>/dev/null && pwd)"
+
+if [ "$#" -eq 0 ]; then
+  echo "usage: hee make <target>   (targets: lab, lab-tcos-www, lab-blog, lab-verify, release)" 1>&2
+  exit 1
+fi
+
+exec make -C "${REPO_ROOT}" "$@"
