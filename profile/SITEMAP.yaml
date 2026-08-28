@@ -55,6 +55,15 @@ sites:
     repo: unknown
     note: "confirmed 2026-08-28: real, kept as-is -- also serves real Gopher content, not just HTTP. Spencer: keep the real content/functionality exactly as it is, just blend its HTTP presentation into the new TCOS design system (site-bar, theme, etc.) -- do not touch the Gopher side."
 
+  # crooked.tcos.us and its subtree (plex.tcos.us, and -- confirmed via
+  # the 2026-08-28 full CF zone dump -- ha/sabnzbd/sonarr/tautulli
+  # .crooked.tcos.us) are a separate real entity with their own IANA
+  # PEN. Deliberately off-limits to TCOS/HEE tooling and out of scope
+  # for this inventory by design -- not tracked here, not a gap.
+  # Confirmed, Spencer direct: "crooked seperate, has it's own PEN and
+  # off limts to tcos hee stuff." Real follow-up deferred to a future
+  # "finger plan" pass (.github#45), not tracked in todo.html.
+
   # --- view.lab.tcos.us -- .github repo, bin/render-review.py + hand-authored pages ---
   - url: https://view.lab.tcos.us/
     repo: .github
