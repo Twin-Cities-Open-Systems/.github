@@ -41,6 +41,23 @@ GOLD_THEME_TOGGLE_RES = {
 # copied verbatim across every real port so far.
 GOLD_PREPAINT_RE = re.compile(r'localStorage\.getItem\("tcos-theme"\)')
 
+# Font-size toggle (S/M/L/XL/XXL) and the lu: freshness row -- real,
+# required Gold components, not optional extras. Missed on the first 4
+# real ports (resume#32, fleet-ops#330); caught live, 2026-08-28:
+# "should all be together, how miss? make not happen again." Gold is a
+# bundle of interchangeable components (Spencer, direct) -- every
+# component gets its own check here so a partial port fails loudly
+# instead of silently shipping "close enough."
+GOLD_FONTSIZE_TOGGLE_RES = {
+    "s": re.compile(r'data-size="s"'),
+    "m": re.compile(r'data-size="m"'),
+    "l": re.compile(r'data-size="l"'),
+    "xl": re.compile(r'data-size="xl"'),
+    "xxl": re.compile(r'data-size="xxl"'),
+}
+GOLD_LU_ROW_RE = re.compile(r'class="lu-row"')
+GOLD_LU_ISO_RE = re.compile(r'class="lu-iso"')
+
 # Full OG set, per view.lab.tcos.us's own <head> (the reference instance).
 # canonical + meta description travel with OG in practice even though
 # they're not technically part of the OG spec -- real precedent is to
@@ -102,6 +119,20 @@ def check_file_from_markup(markup: str) -> list:
         )
     if not GOLD_PREPAINT_RE.search(markup):
         failures.append("Gold theme system: missing pre-paint script (no-flash localStorage read)")
+
+    missing_fontsize = [
+        size for size, pattern in GOLD_FONTSIZE_TOGGLE_RES.items()
+        if not pattern.search(markup)
+    ]
+    if missing_fontsize:
+        failures.append(
+            "Gold font-size toggle: missing size(s) " + ", ".join(missing_fontsize)
+        )
+
+    if not GOLD_LU_ROW_RE.search(markup):
+        failures.append("Gold lu: row: missing (class=\"lu-row\")")
+    if not GOLD_LU_ISO_RE.search(markup):
+        failures.append("Gold lu: row: missing timestamp (class=\"lu-iso\")")
 
     for label, pattern in REQUIRED_META:
         if not pattern.search(markup):

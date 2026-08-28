@@ -36,6 +36,12 @@ GOOD_HTML = """<!DOCTYPE html>
 <button data-theme-choice="light">Light</button>
 <button data-theme-choice="dark">Dark</button>
 <button data-theme-choice="auto">Auto</button>
+<button data-size="s">S</button>
+<button data-size="m">M</button>
+<button data-size="l">L</button>
+<button data-size="xl">XL</button>
+<button data-size="xxl">XXL</button>
+<div class="lu-row"><time class="lu-iso" datetime="2026-08-28T00:00:00Z"></time></div>
 </body></html>"""
 
 BARE_HTML = "<html><head><title>bare</title></head><body>nothing here</body></html>"
@@ -50,7 +56,15 @@ class TestGoldTokens(unittest.TestCase):
         self.assertTrue(any("Gold tokens" in f for f in failures))
         self.assertTrue(any("Gold theme toggle" in f for f in failures))
         self.assertTrue(any("Gold theme system" in f for f in failures))
+        self.assertTrue(any("Gold font-size toggle" in f for f in failures))
+        self.assertTrue(any("Gold lu: row" in f for f in failures))
         self.assertTrue(any("OG: missing og:site_name" in f for f in failures))
+
+    def test_partial_fontsize_toggle_fails(self):
+        # Missing xxl -- a partial toggle isn't Gold's real toggle.
+        markup = GOOD_HTML.replace('<button data-size="xxl">XXL</button>', "")
+        failures = cgo.check_file_from_markup(markup)
+        self.assertTrue(any("xxl" in f for f in failures))
 
     def test_partial_font_pair_fails(self):
         # Only IBM Plex Sans, no JetBrains Mono -- the pair is the name,
