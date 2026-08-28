@@ -36,6 +36,13 @@ class TestTransformHtml(unittest.TestCase):
         expected = '<a href="/people.html">a</a><a href="/activity.html">b</a><a href="/">c</a>'
         self.assertEqual(transform_html(html), expected)
 
+    def test_rewrites_links_with_query_string(self):
+        # real gap, live 404 confirmed 2026-08-28:
+        # careers.html's "Apply" links are href="/contact?apply=ceo&title=..."
+        html = '<a href="/contact?apply=ceo&amp;title=Chief%20Executive%20Officer">Apply</a>'
+        expected = '<a href="/contact.html?apply=ceo&amp;title=Chief%20Executive%20Officer">Apply</a>'
+        self.assertEqual(transform_html(html), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

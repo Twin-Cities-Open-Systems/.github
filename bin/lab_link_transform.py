@@ -12,8 +12,12 @@ building clean-URL support on busybox-httpd.
 
 Usage: lab_link_transform.py <src_dir> <dst_dir>
 Copies every file from src_dir to dst_dir; for .html files, rewrites
-href="/<page>" -> href="/<page>.html" for the known real page set.
-Root ("/") is left alone -- index.html already answers it directly.
+href="/<page>" -> href="/<page>.html" for the known real page set,
+including a real query string if present (careers.html's "Apply"
+links are href="/contact?apply=...&title=..." -- a real gap the first
+version of this script missed, confirmed live 404 on
+lab.tcos.us/contact?apply=ceo&title=...). Root ("/") is left alone --
+index.html already answers it directly.
 """
 import re
 import shutil
@@ -23,12 +27,14 @@ from pathlib import Path
 REAL_PAGES = ["people", "activity", "story", "ir", "careers", "contact"]
 
 _LINK_RE = re.compile(
-    r'href="/(' + "|".join(REAL_PAGES) + r')"'
+    r'href="/(' + "|".join(REAL_PAGES) + r')(\?[^"]*)?"'
 )
 
 
 def transform_html(text: str) -> str:
-    return _LINK_RE.sub(lambda m: f'href="/{m.group(1)}.html"', text)
+    return _LINK_RE.sub(
+        lambda m: f'href="/{m.group(1)}.html{m.group(2) or ""}"', text
+    )
 
 
 def main():
