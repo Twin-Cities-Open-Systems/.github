@@ -53,7 +53,7 @@ sites:
   # removed (was: "abandoned, real TLS cert mismatch, scrub for now").
   - url: https://man.tcos.us/
     repo: unknown
-    note: "confirmed 2026-08-28: real, kept as-is -- also serves real Gopher content, not just HTTP. Spencer: keep the real content/functionality exactly as it is, just blend its HTTP presentation into the new TCOS design system (site-bar, theme, etc.) -- do not touch the Gopher side."
+    note: "confirmed 2026-08-28: real, kept as-is -- also serves real Gopher content, not just HTTP. Spencer: keep the real content/functionality exactly as it is, just blend its HTTP presentation into the new TCOS design system (site-bar, theme, etc.) -- do not touch the Gopher side. Real bug found live via hee-view --sites the same day: man.tcos.us's own HTTPS actually serves foo.tcos.us's page (real cert-mismatch error -- the cert covers foo, not man) -- it never had distinct real content of its own on that box, root cause of why man.lab.tcos.us (below) renders it fresh from the real Gopher source instead of mirroring the broken HTTP side."
 
   # crooked.tcos.us and its subtree (plex.tcos.us, and -- confirmed via
   # the 2026-08-28 full CF zone dump -- ha/sabnzbd/sonarr/tautulli
@@ -100,3 +100,6 @@ sites:
   - url: https://spencer.blog.lab.tcos.us/
     repo: resume
     note: "real, live -- Step 1 of the clone plan, 2026-08-28: same real path-rewrite pattern as spencer.media.lab.tcos.us. Deployed via .github's Makefile (`hee make lab-blog`)."
+  - url: https://man.lab.tcos.us/
+    repo: human-execution-engine
+    note: "real, live -- 2026-08-28, its own dedicated pve container (vmid 109, tcos-gopher-gateway, 10.0.0.172), not a be_view mirror. Real gopher-to-HTML render of live gopher://foo.tcos.us:70 content, ported from Spencer's own existing gopher2html.py on that real box rather than reinvented. Real raw Gopher also works: gopher://man.lab.tcos.us."
