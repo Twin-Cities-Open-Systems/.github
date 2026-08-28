@@ -188,6 +188,21 @@ PAGE_TEMPLATE = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}</title>
+<!-- Real favicon, hosted centrally -- swapping the icon means replacing
+     the files at these paths, never editing page HTML. See
+     /assets/favicon-manifest.json for available variants. -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png">
+<meta property="og:site_name" content="TCOS View">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{og_description}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{og_url}">
+<meta name="twitter:card" content="summary">
+<meta name="description" content="{og_description}">
+<link rel="canonical" href="{og_url}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <script>
 // Real oper theme choice (light/dark/auto), applied before first paint so
@@ -233,8 +248,10 @@ body {{ margin: 0; background: var(--ground); color: var(--ink); font-family: "I
 .site-logo {{ display: flex; align-items: center; gap: 7px; font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: -0.01em; }}
 .site-logo .mark {{ color: var(--accent); font-size: 15px; }}
 .site-logo:hover {{ color: var(--accent-ink); }}
-.fontsize-toggle {{ display: flex; align-items: center; gap: 4px; }}
-.fontsize-toggle span {{ font-family: ui-monospace, monospace; font-size: 10px; color: var(--ink-faint); margin-right: 2px; }}
+.fontsize-toggle {{ display: flex; align-items: center; gap: 6px; }}
+.fontsize-toggle .fs-label {{ font-family: ui-monospace, monospace; font-size: 10px; color: var(--ink-faint); cursor: default; user-select: none; }}
+.fontsize-toggle .fs-options {{ display: flex; align-items: center; gap: 4px; max-width: 0; overflow: hidden; opacity: 0; transition: max-width .18s ease, opacity .12s ease; }}
+.fontsize-toggle:hover .fs-options, .fontsize-toggle:focus-within .fs-options {{ max-width: 200px; opacity: 1; }}
 .fontsize-btn {{ background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-faint); font-family: ui-monospace, monospace; font-size: 10.5px; font-weight: 700; width: 22px; height: 22px; border-radius: 5px; cursor: pointer; line-height: 1; }}
 .fontsize-btn.active {{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }}
 body[data-fontsize="s"] {{ zoom: 0.875; }}
@@ -249,7 +266,9 @@ body[data-fontsize="xxl"] {{ zoom: 1.375; }}
 .toggles-row {{ display: flex; align-items: center; }}
 .eyebrow {{ font-family: "JetBrains Mono", monospace; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }}
 h1 {{ font-size: 20px; font-weight: 600; margin: 0 0 4px; font-family: "JetBrains Mono", monospace; word-break: break-all; }}
-.meta {{ color: var(--ink-faint); font-size: 12.5px; margin: 0 0 18px; }}
+.meta {{ color: var(--ink-faint); font-size: 12.5px; margin: 0 0 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; row-gap: 4px; }}
+.lu-row {{ display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--ink-faint); margin: 0 0 18px; }}
+.lu-row b {{ color: var(--ink-dim); font-weight: 600; }}
 .chip {{ display: inline-flex; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-family: "JetBrains Mono", monospace; font-weight: 600; margin-right: 6px; }}
 .chip.new {{ background: var(--good-soft); color: var(--good); }}
 .chip.mod {{ background: var(--warning-soft); color: var(--warning); }}
@@ -342,18 +361,25 @@ pre.diff {{ background: var(--surface); border: 1px solid var(--line); border-ra
         <button class="theme-btn" data-theme-choice="auto" type="button">Auto</button>
       </div>
       <div class="fontsize-toggle">
-        <span>Aa</span>
-        <button class="fontsize-btn" data-size="s" type="button">S</button>
-        <button class="fontsize-btn" data-size="m" type="button">M</button>
-        <button class="fontsize-btn" data-size="l" type="button">L</button>
-        <button class="fontsize-btn" data-size="xl" type="button">XL</button>
-        <button class="fontsize-btn" data-size="xxl" type="button">XXL</button>
+        <span class="fs-label" tabindex="0">Aa</span>
+        <div class="fs-options">
+          <button class="fontsize-btn" data-size="s" type="button">S</button>
+          <button class="fontsize-btn" data-size="m" type="button">M</button>
+          <button class="fontsize-btn" data-size="l" type="button">L</button>
+          <button class="fontsize-btn" data-size="xl" type="button">XL</button>
+          <button class="fontsize-btn" data-size="xxl" type="button">XXL</button>
+        </div>
       </div>
     </div>
   </div>
   <p class="eyebrow">{repo} &middot; {status_label}</p>
   <h1>{path}</h1>
-  <p class="meta"><span class="chip {status_class}">{status_label}</span>rendered {generated}</p>
+  <p class="meta"><span class="chip {status_class}">{status_label}</span></p>
+  <div class="lu-row">
+    <span><b>lu:</b> <time class="lu-iso" datetime="{generated_iso}">{generated_iso}</time> &middot; <span class="lu-human"></span> &middot; <span class="lu-delta"></span></span>
+    <span><b>commit:</b> {commit_info}</span>
+    <span><b>license:</b> {license_info}</span>
+  </div>
 
   <div class="tabs">
     <div class="tab active" data-tab="diff">Diff</div>
@@ -390,6 +416,7 @@ document.querySelectorAll(".tab").forEach(function (t) {{
     b.addEventListener("click", function () {{
       try {{ localStorage.setItem(FS_KEY, b.dataset.size); }} catch (e) {{}}
       applyFontsize(b.dataset.size);
+      b.blur();
     }});
   }});
 }})();
@@ -421,6 +448,35 @@ document.querySelectorAll(".tab").forEach(function (t) {{
       markActive(choice);
     }});
   }});
+}})();
+
+(function () {{
+  // "lu:" (last-updated) widget -- real ISO timestamp is server-rendered
+  // and always present even with JS off; this fills in the viewer's own
+  // local-time rendering and a live ticking delta on top of it.
+  var isoEl = document.querySelector(".lu-iso");
+  if (!isoEl) return;
+  var generated = new Date(isoEl.getAttribute("datetime"));
+  var humanEl = document.querySelector(".lu-human");
+  var deltaEl = document.querySelector(".lu-delta");
+  if (humanEl) {{
+    humanEl.textContent = generated.toLocaleString(undefined, {{
+      dateStyle: "medium", timeStyle: "short"
+    }});
+  }}
+  function renderDelta() {{
+    if (!deltaEl) return;
+    var ms = Date.now() - generated.getTime();
+    var mins = Math.floor(ms / 60000);
+    var label;
+    if (mins < 1) label = "just now";
+    else if (mins < 60) label = mins + "m ago";
+    else if (mins < 60 * 24) label = Math.floor(mins / 60) + "h" + (mins % 60) + "m ago";
+    else label = Math.floor(mins / (60 * 24)) + "d ago";
+    deltaEl.textContent = label;
+  }}
+  renderDelta();
+  setInterval(renderDelta, 30000);
 }})();
 
 (function () {{
@@ -561,6 +617,66 @@ def real_repo_name(repo: str) -> str:
     return resolved.name
 
 
+def get_commit_info(repo: str, path: str, is_new: bool) -> str:
+    """Real commit SHA this page's content reflects, or an honest
+    'uncommitted' label -- never a fabricated/assumed commit."""
+    head_sha = sh(["git", "rev-parse", "--short", "HEAD"], cwd=repo).strip()
+    if not head_sha:
+        return "no commits yet"
+    if is_new:
+        return f"new, uncommitted (HEAD {head_sha})"
+    dirty = sh(["git", "status", "--porcelain", "--", path], cwd=repo).strip()
+    if dirty:
+        return f"uncommitted changes (HEAD {head_sha})"
+    return head_sha
+
+
+_LICENSE_CACHE: dict[str, str] = {}
+
+# Real signature strings from each license's own first lines -- detect by
+# content, not filename alone (a LICENSE file's actual text is the only
+# honest source; the name alone doesn't tell you which one). Order matters:
+# check more specific/longer signatures before generic ones.
+_LICENSE_SIGNATURES = [
+    ("GNU GENERAL PUBLIC LICENSE\n                       Version 3", "GPL-3.0"),
+    ("GNU GENERAL PUBLIC LICENSE\n                       Version 2", "GPL-2.0"),
+    ("GNU AFFERO GENERAL PUBLIC LICENSE", "AGPL-3.0"),
+    ("GNU LESSER GENERAL PUBLIC LICENSE", "LGPL"),
+    ("Apache License\n                           Version 2.0", "Apache-2.0"),
+    ("MIT License", "MIT"),
+    ("BSD 3-Clause", "BSD-3-Clause"),
+    ("BSD 2-Clause", "BSD-2-Clause"),
+]
+
+
+def detect_license(repo: str) -> str:
+    """Real lookup against the repo's own LICENSE file -- not a hardcoded
+    assumption, since it can genuinely change or differ per repo."""
+    key = str(Path(repo).resolve())
+    if key in _LICENSE_CACHE:
+        return _LICENSE_CACHE[key]
+
+    root = Path(key)
+    result = "no LICENSE file found"
+    for name in ("LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING"):
+        candidate = root / name
+        if candidate.is_file():
+            try:
+                head = candidate.read_text(encoding="utf-8", errors="replace")[:2000]
+            except OSError:
+                head = ""
+            for sig, label in _LICENSE_SIGNATURES:
+                if sig in head:
+                    result = label
+                    break
+            else:
+                result = "LICENSE file present, type not recognized"
+            break
+
+    _LICENSE_CACHE[key] = result
+    return result
+
+
 # Skip vendored/binary/build-output dirs when walking a whole tree -- real
 # doc/config content lives outside all of these in every repo checked.
 SKIP_DIRS = {
@@ -611,21 +727,28 @@ DEFAULT_BROWSE_SUBDIRS_BY_REPO = {
 }
 
 
-def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated: str):
+def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: str):
     repo_name = real_repo_name(repo)
     safe_repo = repo_name.lstrip(".") or repo_name
     if not subdirs:
         subdirs = DEFAULT_BROWSE_SUBDIRS_BY_REPO.get(safe_repo, ["docs"])
+    license_info = detect_license(repo)
     for path in iter_tree_files(repo, subdirs):
         diff_html = get_diff_html(repo, path, new=False)
         pretty_html = get_pretty_html(repo, path)
+        commit_info = get_commit_info(repo, path, is_new=False)
+        og_url = f"https://view.lab.tcos.us/files/{safe_repo}/{path}.html"
         page = PAGE_TEMPLATE.format(
             title=f"{path} -- {safe_repo}",
             repo=safe_repo,
             path=path,
             status_class="browse",
             status_label="browse",
-            generated=generated,
+            generated_iso=generated_iso,
+            commit_info=commit_info,
+            license_info=license_info,
+            og_description=f"{path} in {safe_repo} -- pretty-printed and diffed by TCOS View.",
+            og_url=og_url,
             diff_html=diff_html,
             pretty_html=pretty_html,
             pygments_css=PYGMENTS_CSS,
@@ -656,10 +779,11 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     import datetime
-    generated = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    generated_iso = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
 
     for repo in args.repos:
         repo_name = real_repo_name(repo)
+        license_info = detect_license(repo)
 
         for status, path in git_status(repo):
             if is_deleted(status):
@@ -667,14 +791,20 @@ def main() -> int:
             new = is_new(status)
             diff_html = get_diff_html(repo, path, new)
             pretty_html = get_pretty_html(repo, path)
+            commit_info = get_commit_info(repo, path, new)
             slug = slug_for(repo_name, path)
+            og_url = f"https://view.lab.tcos.us/diffs/{slug}"
             page = PAGE_TEMPLATE.format(
                 title=f"{path} -- {repo_name}",
                 repo=repo_name,
                 path=path,
                 status_class="new" if new else "mod",
                 status_label="new" if new else "modified",
-                generated=generated,
+                generated_iso=generated_iso,
+                commit_info=commit_info,
+                license_info=license_info,
+                og_description=f"{'New' if new else 'Modified'} file: {path} in {repo_name} -- reviewed via TCOS View.",
+                og_url=og_url,
                 diff_html=diff_html,
                 pretty_html=pretty_html,
                 pygments_css=PYGMENTS_CSS,
@@ -688,7 +818,7 @@ def main() -> int:
             subdirs = [s for s in subdir_str.split(",") if s]
         else:
             repo, subdirs = spec, []
-        render_browse(repo, subdirs, out_dir, generated)
+        render_browse(repo, subdirs, out_dir, generated_iso)
 
     return 0
 
