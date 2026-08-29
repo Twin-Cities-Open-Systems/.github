@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Spencer Butler <dev@tcos.us>
-# check_gold_og.py
+# check_render_review_compliance.py
 # Verifies real page assets adhere to Gold (profile/GLOSSARY.md) and
 # carry a full Open Graph tag set. Checks HTML files directly and
 # extracts embedded HTML templates from Python source (e.g. gopher2html's
@@ -113,7 +113,15 @@ def inline_local_stylesheets(markup: str, base_dir: str) -> str:
     for href in LOCAL_STYLESHEET_RE.findall(markup):
         if href.startswith("http://") or href.startswith("https://"):
             continue
-        css_path = os.path.join(base_dir, href)
+        # Real bug, found 2026-08-28: os.path.join silently discards
+        # base_dir entirely when href is root-relative ("/shell-theme.css",
+        # a real, valid, common pattern -- resume's media subsystem uses
+        # it) -- os.path.join('/a/b', '/c') returns '/c', not '/a/b/c'.
+        # A root-relative link's real target is this same directory in
+        # every real case in this org (root-relative CSS always lives
+        # alongside its HTML here), so strip the leading slash before
+        # joining rather than let Python treat it as filesystem-absolute.
+        css_path = os.path.join(base_dir, href.lstrip("/"))
         if os.path.isfile(css_path):
             with open(css_path, encoding="utf-8", errors="replace") as f:
                 extra.append(f.read())
@@ -245,7 +253,7 @@ def check_file(path: str) -> list:
 
 def main(argv: list) -> int:
     if not argv:
-        print("usage: check_gold_og.py <file> [file...]", file=sys.stderr)
+        print("usage: check_render_review_compliance.py <file> [file...]", file=sys.stderr)
         return 2
 
     any_failed = False

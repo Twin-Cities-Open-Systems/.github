@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Spencer Butler <dev@tcos.us>
-# test_check_gold_og.py
-# Real unit tests for check_gold_og.py -- known-good and known-bad
+# test_check_render_review_compliance.py
+# Real unit tests for check_render_review_compliance.py -- known-good and known-bad
 # fixtures for both the Gold-adherence checks and the OG-completeness
 # checks, plus the .py embedded-template extraction path.
 
@@ -9,7 +9,7 @@ import os
 import tempfile
 import unittest
 
-import check_gold_og as cgo
+import check_render_review_compliance as cgo
 
 
 GOOD_HTML = """<!DOCTYPE html>
@@ -119,6 +119,26 @@ class TestLocalStylesheetFollowing(unittest.TestCase):
             html_no_inline_accent = GOOD_HTML.replace("#0d7d78", "").replace("#3fd4c8", "")
             html_no_inline_accent = html_no_inline_accent.replace(
                 "<style>", '<link rel="stylesheet" href="site.css"><style>'
+            )
+            html_path = os.path.join(d, "page.html")
+            with open(html_path, "w") as f:
+                f.write(html_no_inline_accent)
+            self.assertEqual(cgo.check_file(html_path), [])
+
+    def test_follows_root_relative_stylesheet_for_tokens(self):
+        # Real regression, found 2026-08-28: resume's media subsystem
+        # links its shared stylesheet as href="/shell-theme.css" (real,
+        # valid, root-relative -- a common pattern) and os.path.join
+        # silently discards base_dir for any absolute-looking href,
+        # so this always failed until fixed. Same shape as the sibling
+        # test above, root-relative href instead of a bare relative one.
+        with tempfile.TemporaryDirectory() as d:
+            css_path = os.path.join(d, "shell-theme.css")
+            with open(css_path, "w") as f:
+                f.write(":root { --accent: #0d7d78; } .dark { --accent: #3fd4c8; }")
+            html_no_inline_accent = GOOD_HTML.replace("#0d7d78", "").replace("#3fd4c8", "")
+            html_no_inline_accent = html_no_inline_accent.replace(
+                "<style>", '<link rel="stylesheet" href="/shell-theme.css"><style>'
             )
             html_path = os.path.join(d, "page.html")
             with open(html_path, "w") as f:
