@@ -21,41 +21,19 @@ fi
 
 REPOS=$("${WORKSPACE_DIR}/.github/bin/manage-org-repos.sh" --names-only)
 
-for repo in $REPOS; do
-    repo_path="${WORKSPACE_DIR}/${repo}"
-    if [ ! -d "$repo_path" ]; then
-        printf "%-30s | %-25s | %-15s\n" "$repo" "[MISSING CLONE]" "⚠️ ACTION REQ"
-        continue
-    fi
-
-    (
-        cd "$repo_path"
-        
-        # Extract active branch name safely
-        active_branch=$(git branch --show-current 2>/dev/null || echo "[DETACHED HEAD]")
-        [ -z "$active_branch" ] && active_branch="[DETACHED HEAD]"
-        
-        # Check for uncommitted modifications or untracked file paths
-        local_status="Clean"
-        if ! git diff-index --quiet HEAD -- || [ -n "$(git status --porcelain)" ]; then
-            local_status="DIRTY 📦"
-        fi
-        
-        # Check tracking status against remote tracking branch if upstream is configured
-        if git rev-parse --verify @{u} &>/dev/null; then
-            local_commits=$(git rev-list --count @{u}..HEAD)
-            remote_commits=$(git rev-list --count HEAD..@{u})
-            
-            if [ "$local_commits" -gt 0 ] && [ "$remote_commits" -gt 0 ]; then
-                local_status="$local_status (Diverged 🔄)"
-            elif [ "$local_commits" -gt 0 ]; then
-                local_status="$local_status (Unpushed ⬆️)"
-            elif [ "$remote_commits" -gt 0 ]; then
-                local_status="$local_status (Outdated ⬇️)"
-            fi
-        fi
-
-        printf "%-30s | %-25s | %-15s\n" "$repo" "$active_branch" "$local_status"
-    )
-done
+# Real trigger (2026-08-29): same-day survey of shell for-loops as
+# GNU-parallel candidates. Per-repo logic extracted to
+# audit-repo-branch-state.sh (now also does a real `git fetch` first --
+# a real correctness gap the old inline version had, judging
+# Diverged/Outdated off whatever @{u} happened to already be cached
+# locally). Fans out via GNU parallel, --keep-order so the table still
+# reads in the same real repo-list order; falls back to the original
+# sequential loop when parallel isn't installed.
+if command -v parallel >/dev/null 2>&1; then
+    parallel --keep-order "${WORKSPACE_DIR}/.github/bin/audit-repo-branch-state.sh" {} "${WORKSPACE_DIR}/{}" ::: $REPOS
+else
+    for repo in $REPOS; do
+        "${WORKSPACE_DIR}/.github/bin/audit-repo-branch-state.sh" "$repo" "${WORKSPACE_DIR}/${repo}"
+    done
+fi
 echo "================================================================================"
