@@ -1,13 +1,20 @@
 # profile/SITEMAP.yaml
 #
 # Real, hand-curated inventory of every known real page across TCOS's
-# public and lab surfaces. NOT a full Cloudflare DNS zone dump -- built
-# from a `dig`-based sweep of plausible names plus this org's own real,
-# already-known page lists. Can miss a real record nothing here thought
-# to guess. A real, authoritative sweep needs a real Cloudflare API
-# token run through the `dns_records` endpoint -- not done yet.
+# public and lab surfaces. Cross-checked 2026-08-30 against a real,
+# full Cloudflare dns_records API sweep of the tcos.us zone (closes
+# the gap .github#70 flagged as blocking -- a real token now exists,
+# tcos-www's .hee/secrets/cloudflare-tcos-www.gpg). Found and fixed:
+# foo.tcos.us retired (removed), blog.tcos.us/media.tcos.us/
+# touchy.blog.tcos.us missing (added). *.lab.tcos.us hosts are a
+# separate real zone (internal ns1, not Cloudflare) -- not covered by
+# this sweep, unaffected. One real, unresolved finding: a public
+# `stage.tcos.us` A record points at 10.0.0.113, an internal IP with
+# no matching real PVE container/VM and no reverse DNS -- genuinely
+# stale or a real leftover from something now gone. Not deleted here,
+# needs a real human call, not a guess.
 #
-# last full CF zone dump: never, dig-sweep only, 2026-08-28
+# last full CF zone dump: 2026-08-30 (real dns_records API sweep)
 #
 # Consumed by `hee-view --sites` (human-execution-engine/tooling/bin/
 # hee-view) as the real default source for its health check.
@@ -28,7 +35,7 @@ sites:
     note: real, live (301 redirect, not yet confirmed to what)
   - url: https://tcos.us/contracts
     repo: tcos-www
-    note: NOT YET LIVE -- the real trigger for this whole clone plan, real content already built and approved at view.lab.tcos.us/contracts.html
+    note: "real, live -- confirmed 2026-08-30 (was NOT YET LIVE when this entry was first written). Real content cloned from view.lab.tcos.us/contracts.html per the original clone plan; that page remains the real source for future edits."
 
   # --- spencer.media.tcos.us -- Cloudflare Pages, resume repo ---
   - url: https://spencer.media.tcos.us/
@@ -42,18 +49,32 @@ sites:
   - url: https://spencer.blog.tcos.us/
     repo: resume
     note: real, live
+  - url: https://touchy.blog.tcos.us/
+    repo: resume
+    note: "real, live -- confirmed 2026-08-30 via a real Cloudflare dns_records API sweep (closes the gap .github#70 flagged as blocking -- no real token existed for this before). touchy-claude's own per-person blog, parallel to spencer.blog.tcos.us. Missing from this inventory until now."
+
+  # --- blog.tcos.us / media.tcos.us -- category-level hubs, Cloudflare Pages, resume repo ---
+  - url: https://blog.tcos.us/
+    repo: resume
+    note: "real, live -- confirmed 2026-08-30 via the same real dns_records sweep. Prod counterpart of the already-tracked blog.lab.tcos.us hub (blog-hub.html, 'every operator' list). Missing from this inventory until now."
+  - url: https://media.tcos.us/
+    repo: resume
+    note: "real, live -- confirmed 2026-08-30 via the same real dns_records sweep. Prod counterpart of the already-tracked media.lab.tcos.us hub (media-hub.html, 'every operator' list). Missing from this inventory until now."
 
   # --- external, non-Cloudflare, NOT pve-managed (DigitalOcean, 159.65.46.8) ---
-  - url: https://foo.tcos.us/
-    repo: unknown
-    note: "real, live -- confirmed 2026-08-28: the real generic-POC dogfood slot. Standing role is to always host whatever idea/product/service is currently being dogfooded -- the tenant changes, the role doesn't. Real tenant/private-plan detail intentionally not recorded here -- see internal tracking instead."
   # rtfm.tcos.us -- killed 2026-08-28: real Cloudflare A record
   # (159.65.46.8) deleted via the API, confirmed gone against
   # Cloudflare's own authoritative nameserver. No longer real, entry
   # removed (was: "abandoned, real TLS cert mismatch, scrub for now").
+  # foo.tcos.us -- retired 2026-08-30: real, explicit decision to
+  # consolidate the droplet down to one identity. Its Cloudflare A
+  # record was deleted (confirmed gone against the authoritative NS),
+  # its nginx server blocks/systemd units/scripts removed, and the
+  # droplet's own OS hostname + DigitalOcean resource both renamed to
+  # man.tcos.us (fleet-ops#353). No longer real, entry removed.
   - url: https://man.tcos.us/
-    repo: unknown
-    note: "confirmed 2026-08-28: real, kept as-is -- also serves real Gopher content, not just HTTP. Spencer: keep the real content/functionality exactly as it is, just blend its HTTP presentation into the new TCOS design system (site-bar, theme, etc.) -- do not touch the Gopher side. Real bug found live via hee-view --sites the same day: man.tcos.us's own HTTPS actually serves foo.tcos.us's page (real cert-mismatch error -- the cert covers foo, not man) -- it never had distinct real content of its own on that box, root cause of why man.lab.tcos.us (below) renders it fresh from the real Gopher source instead of mirroring the broken HTTP side."
+    repo: fleet-ops
+    note: "confirmed 2026-08-30: real, live -- now the droplet's sole identity (159.65.46.8) after foo.tcos.us's retirement, on the real default ports (70 gopher, 8070 HTTP gateway). Serves its own real content and OG-meta (previously it mistakenly served foo.tcos.us's page/cert -- that bug no longer applies, foo doesn't exist anymore to conflict with). Still real Gopher, not just HTTP -- gopher://man.tcos.us/ (no port suffix needed) now works directly since foo no longer competes for the default port. Source: fleet-ops/hosts/man-tcos-us/."
 
   # crooked.tcos.us and its subtree (plex.tcos.us, and -- confirmed via
   # the 2026-08-28 full CF zone dump -- ha/sabnzbd/sonarr/tautulli
@@ -102,7 +123,7 @@ sites:
     note: "real, live -- Step 1 of the clone plan, 2026-08-28: same real path-rewrite pattern as spencer.media.lab.tcos.us. Deployed via .github's Makefile (`hee make lab-blog`)."
   - url: https://man.lab.tcos.us/
     repo: fleet-ops
-    note: "real, live -- 2026-08-28, its own dedicated pve container (vmid 109, tcos-gopher-gateway, 10.0.0.172), not a be_view mirror. Real gopher-to-HTML render of live gopher://foo.tcos.us:70 content, ported from Spencer's own existing gopher2html.py on that real box rather than reinvented. Real raw Gopher also works: gopher://man.lab.tcos.us. Source moved fleet-ops after this entry was first written -- human-execution-engine's pve/ is real TCOS infra, not platform-independent doctrine."
+    note: "real, live -- 2026-08-28, its own dedicated pve container (vmid 109, tcos-gopher-gateway, 10.0.0.172), not a be_view mirror. Real gopher-to-HTML render of live gopher://man.tcos.us:70 content (relay/gateway repointed 2026-08-30 after foo.tcos.us's retirement -- was foo.tcos.us:70, now stale since foo no longer exists). Real raw Gopher also works: gopher://man.lab.tcos.us. Source moved fleet-ops after this entry was first written -- human-execution-engine's pve/ is real TCOS infra, not platform-independent doctrine."
   - url: https://foo.lab.tcos.us/
     repo: fleet-ops
     note: "real, live -- 2026-08-28, real foo.tcos.us index.html mirrored onto be_view's shared webroot (static, self-contained, no dedicated container needed unlike man)."
