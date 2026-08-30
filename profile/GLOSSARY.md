@@ -96,6 +96,12 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Why this keeps recurring**: something in the chat rendering path auto-links a bare `#N` using whatever repo context it assumes, silently pointing at the wrong repo/issue -- and, per this newest catch, even the org's own compact `issue:N@repo` notation isn't reliably rendered as a real clickable link in chat either. Full URLs are the only form confirmed to work every time.
 * **Enforcement**: before sending any chat message, scan it for the literal pattern `#\d+` and for `issue:`/`pr:` shorthand, and replace every instance with a full URL. Not a judgment call about whether context makes the short form "obviously" safe -- it silently isn't, repeatedly, even after being told directly.
 
+### Status Block
+* **Type:** Chat/Output Convention
+* **Invariant Standard:** The default shape for any multi-item progress report, task summary, or backlog rundown in chat: short bulleted lines, each prefixed with an icon+label status marker (✅ done / ⏳ in progress / ❌ blocked, or equivalent -- never a bare color alone, already consistent with rule #11's dataviz-skill requirement), real markdown links (`[label](full-url)`, per `Real Links Only` above) for every issue/PR reference, no narrative padding wrapped around the list. Applies by default, not just in this repo or TCOS-org sessions -- a general chat-output convention.
+* **Real, live precedent, 2026-08-30:** an agent posted a "Status right now:" block in exactly this shape mid-session; Spencer, direct, quoting it verbatim: "this, this is how I always want you to talk to me." Landed after repeated earlier corrections the same session toward terser output ("terse pretty output", "give me links") -- this is the concrete format that finally matched what he wanted, not a guess.
+* **Not the same as**: a single-item answer or a genuinely narrative explanation, where forcing a bullet-list shape would fragment reasoning that needs to read as connected prose -- the convention applies to multi-item status/progress reporting specifically.
+
 ### Documentation Invariant
 * **Type:** Transparency Security Gate
 * **Invariant Standard:** No private structural details, operational API keys, specific vendor names, or target asset metrics may ever be written into the text descriptions of repositories marked as `(Private)` or `(Very Private)`. All private repository entries must use abstract operational language.
