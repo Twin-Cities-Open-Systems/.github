@@ -1,13 +1,20 @@
 # profile/SITEMAP.yaml
 #
 # Real, hand-curated inventory of every known real page across TCOS's
-# public and lab surfaces. NOT a full Cloudflare DNS zone dump -- built
-# from a `dig`-based sweep of plausible names plus this org's own real,
-# already-known page lists. Can miss a real record nothing here thought
-# to guess. A real, authoritative sweep needs a real Cloudflare API
-# token run through the `dns_records` endpoint -- not done yet.
+# public and lab surfaces. Cross-checked 2026-08-30 against a real,
+# full Cloudflare dns_records API sweep of the tcos.us zone (closes
+# the gap .github#70 flagged as blocking -- a real token now exists,
+# tcos-www's .hee/secrets/cloudflare-tcos-www.gpg). Found and fixed:
+# foo.tcos.us retired (removed), blog.tcos.us/media.tcos.us/
+# touchy.blog.tcos.us missing (added). *.lab.tcos.us hosts are a
+# separate real zone (internal ns1, not Cloudflare) -- not covered by
+# this sweep, unaffected. One real, unresolved finding: a public
+# `stage.tcos.us` A record points at 10.0.0.113, an internal IP with
+# no matching real PVE container/VM and no reverse DNS -- genuinely
+# stale or a real leftover from something now gone. Not deleted here,
+# needs a real human call, not a guess.
 #
-# last full CF zone dump: never, dig-sweep only, 2026-08-28
+# last full CF zone dump: 2026-08-30 (real dns_records API sweep)
 #
 # Consumed by `hee-view --sites` (human-execution-engine/tooling/bin/
 # hee-view) as the real default source for its health check.
@@ -42,6 +49,17 @@ sites:
   - url: https://spencer.blog.tcos.us/
     repo: resume
     note: real, live
+  - url: https://touchy.blog.tcos.us/
+    repo: resume
+    note: "real, live -- confirmed 2026-08-30 via a real Cloudflare dns_records API sweep (closes the gap .github#70 flagged as blocking -- no real token existed for this before). touchy-claude's own per-person blog, parallel to spencer.blog.tcos.us. Missing from this inventory until now."
+
+  # --- blog.tcos.us / media.tcos.us -- category-level hubs, Cloudflare Pages, resume repo ---
+  - url: https://blog.tcos.us/
+    repo: resume
+    note: "real, live -- confirmed 2026-08-30 via the same real dns_records sweep. Prod counterpart of the already-tracked blog.lab.tcos.us hub (blog-hub.html, 'every operator' list). Missing from this inventory until now."
+  - url: https://media.tcos.us/
+    repo: resume
+    note: "real, live -- confirmed 2026-08-30 via the same real dns_records sweep. Prod counterpart of the already-tracked media.lab.tcos.us hub (media-hub.html, 'every operator' list). Missing from this inventory until now."
 
   # --- external, non-Cloudflare, NOT pve-managed (DigitalOcean, 159.65.46.8) ---
   # rtfm.tcos.us -- killed 2026-08-28: real Cloudflare A record
