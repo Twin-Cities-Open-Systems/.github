@@ -266,6 +266,7 @@ body {{ margin: 0; background: var(--ground); color: var(--ink); font-family: "I
 .fontsize-toggle .fs-label {{ font-family: ui-monospace, monospace; font-size: 10px; color: var(--ink-faint); cursor: default; user-select: none; }}
 .fontsize-toggle .fs-options {{ display: flex; align-items: center; gap: 4px; max-width: 0; overflow: hidden; opacity: 0; transition: max-width .18s ease, opacity .12s ease; }}
 .fontsize-toggle:hover .fs-options, .fontsize-toggle:focus-within .fs-options {{ max-width: 200px; opacity: 1; }}
+.fontsize-toggle.fs-force-collapsed .fs-options {{ max-width: 0 !important; opacity: 0 !important; }}
 .fontsize-btn {{ background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-faint); font-family: ui-monospace, monospace; font-size: 10.5px; font-weight: 700; width: 22px; height: 22px; border-radius: 5px; cursor: pointer; line-height: 1; }}
 .fontsize-btn.active {{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }}
 body[data-fontsize="s"] {{ zoom: 0.875; }}
@@ -431,6 +432,18 @@ document.querySelectorAll(".tab").forEach(function (t) {{
       try {{ localStorage.setItem(FS_KEY, b.dataset.size); }} catch (e) {{}}
       applyFontsize(b.dataset.size);
       b.blur();
+      // Real fix, 2026-08-30: :hover alone keeps .fs-options expanded
+      // after a click, since the cursor is still sitting over the
+      // widget -- force-collapse it, then let normal hover/focus-within
+      // behavior resume once the cursor actually leaves.
+      var toggle = b.closest(".fontsize-toggle");
+      if (toggle) {{
+        toggle.classList.add("fs-force-collapsed");
+        toggle.addEventListener("mouseleave", function onLeave() {{
+          toggle.classList.remove("fs-force-collapsed");
+          toggle.removeEventListener("mouseleave", onLeave);
+        }});
+      }}
     }});
   }});
 }})();
