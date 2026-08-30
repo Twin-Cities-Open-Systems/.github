@@ -35,7 +35,7 @@ sites:
     note: real, live (301 redirect, not yet confirmed to what)
   - url: https://tcos.us/contracts
     repo: tcos-www
-    note: NOT YET LIVE -- the real trigger for this whole clone plan, real content already built and approved at view.lab.tcos.us/contracts.html
+    note: "real, live -- confirmed 2026-08-30 (was NOT YET LIVE when this entry was first written). Real content cloned from view.lab.tcos.us/contracts.html per the original clone plan; that page remains the real source for future edits."
 
   # --- spencer.media.tcos.us -- Cloudflare Pages, resume repo ---
   - url: https://spencer.media.tcos.us/
