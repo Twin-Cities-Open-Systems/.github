@@ -124,9 +124,14 @@ sites:
   - url: https://man.lab.tcos.us/
     repo: fleet-ops
     note: "real, live -- 2026-08-28, its own dedicated pve container (vmid 109, tcos-gopher-gateway, 10.0.0.172), not a be_view mirror. Real gopher-to-HTML render of live gopher://man.tcos.us:70 content (relay/gateway repointed 2026-08-30 after foo.tcos.us's retirement -- was foo.tcos.us:70, now stale since foo no longer exists). Real raw Gopher also works: gopher://man.lab.tcos.us. Source moved fleet-ops after this entry was first written -- human-execution-engine's pve/ is real TCOS infra, not platform-independent doctrine."
-  - url: https://foo.lab.tcos.us/
-    repo: fleet-ops
-    note: "real, live -- 2026-08-28, real foo.tcos.us index.html mirrored onto be_view's shared webroot (static, self-contained, no dedicated container needed unlike man)."
+  # foo.lab.tcos.us -- retired 2026-08-30, same real decision as
+  # foo.tcos.us: static mirror file removed from be_view's shared
+  # webroot (container 107), haproxy ACL/routing removed
+  # (pve/haproxy/haproxy.cfg, fleet-ops). No longer real, entry
+  # removed. Also found and fixed in the same pass: /www/foo/ian.html
+  # was a real, unrelated, misplaced file (a stray copy of
+  # view.lab.tcos.us/ian.html) sitting in the foo mirror directory --
+  # removed too, per Spencer's direct confirmation, not silently kept.
   - url: https://blog.lab.tcos.us/
     repo: resume
     note: "real, live -- 2026-08-28, category-level hub (blog-hub.html, 'every operator' list), real haproxy ACL+backend from fleet-ops#329. Missing from this inventory until now -- confirmed 200 via curl --resolve, added retroactively."
