@@ -42,6 +42,15 @@ jobs:
 
       - name: "Run hee-view --sites against the real site map"
         run: |
+          # --network public: a GitHub-hosted runner has NO ROUTE into the
+          # private lab network, so *.lab.tcos.us can never resolve here.
+          # Checking them anyway made this workflow permanently red on 14/14
+          # hosts, every 30 minutes -- see fleet-ops#350. A real outage was
+          # invisible in that noise.
+          #
+          # Lab hosts are checked by an on-host timer inside the lab, which
+          # can actually reach them. Neither checker pretends to see the
+          # other's network.
           python3 human-execution-engine/tooling/bin/hee-view \
-            --sites --nerd \
+            --sites --nerd --network public \
             --sitemap dot-github/profile/SITEMAP.yaml
