@@ -102,6 +102,24 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Real, live precedent, 2026-08-30:** an agent posted a "Status right now:" block in exactly this shape mid-session; Spencer, direct, quoting it verbatim: "this, this is how I always want you to talk to me." Landed after repeated earlier corrections the same session toward terser output ("terse pretty output", "give me links") -- this is the concrete format that finally matched what he wanted, not a guess.
 * **Not the same as**: a single-item answer or a genuinely narrative explanation, where forcing a bullet-list shape would fragment reasoning that needs to read as connected prose -- the convention applies to multi-item status/progress reporting specifically.
 
+### Tool Maturity Ladder
+* **Type:** Engineering Convention
+* **Invariant Standard:** A new tool starts at the least capable language that does the real job and graduates only when it has actually outgrown it -- `library/bash/*.shfn.bash` (sourced function) -> `tooling/bin/*` sh/bash (standalone) -> `tooling/bin/*.py` -> a real `hee` subcommand -> Go/Rust/C. Canonical in `human-execution-engine`'s `prompts/PROMPTING_RULES.md` rule 13. Never start heavier "to be safe" or "for consistency."
+
+### Graduation Signal
+* **Type:** Engineering Convention
+* **Invariant Standard:** A concrete, observable symptom that a tool has outgrown its current rung of the **Tool Maturity Ladder**. The point of naming them is that graduation should be triggered by evidence, not taste -- and that the usual instinct, contorting the code to stay at the current rung, is the actual mistake. Every signal below was hit for real, 2026-08-31, building `hee-check` and the shared regex registry.
+* **Signals -- any one is sufficient, they do not need to accumulate:**
+  * **Regex ceiling.** The pattern needs something the language's engine cannot express -- lookaround or backreferences in POSIX ERE, `rg`, or Go's RE2. Mangling the pattern to fit costs precision, and precision is the job. Operator, 2026-08-31: *"there is no 'one regex to rule them all' we use what each lang supports, to it's fullest. that may be a trigger to write the tool in the next up lang if regex is a bottle neck."*
+  * **Quoting is the bug source.** More defects come from shell escaping than from the logic. Real instances in a single session: a pattern interpolated into an `awk` `/.../` literal broke on any pattern containing `/`; `sed`'s default `/` address delimiter broke the same way; backticks inside a double-quoted `git commit -m` were command-substituted, silently blanking words, three times.
+  * **Real parsing needed.** The tool begins hand-rolling a parser for structured input -- YAML, JSON, argv, nested quoting. `hee-check refs` crossed this line immediately.
+  * **Data structures needed.** The logic wants a map, a set, or de-duplication. In shell those become string-joined arrays and repeated `grep`, which is where correctness quietly goes.
+  * **Untestable without spawning processes.** The logic cannot be exercised except by running the whole tool. A library function that can be unit-tested is worth more than a shorter script.
+  * **POSIX ceiling.** The tool needs a bash-only construct -- `[[ =~ ]]`, arrays, `${x^^}` -- while org shell scripts are POSIX. Wanting bash is the signal; reaching for it silently is the defect.
+  * **Process-spawn cost.** The work is O(N x M) subprocesses -- N items times M attempts. Fine once, a real cost in a loop or in CI.
+  * **Implementation drift underfoot.** The tool depends on behaviour that differs between implementations of the same command (GNU vs BSD, `grep` vs `ugrep`, `awk` vs `mawk`, GNU `find` vs `bfs`). Measured on kiosk: `grep` and `find` resolve to different implementations through a shell than through a direct exec.
+* **Non-signals, explicitly:** file length alone, personal preference for a language, or expecting to need a feature later. Graduate on a symptom you have actually hit, not one you anticipate.
+
 ### Documentation Invariant
 * **Type:** Transparency Security Gate
 * **Invariant Standard:** No private structural details, operational API keys, specific vendor names, or target asset metrics may ever be written into the text descriptions of repositories marked as `(Private)` or `(Very Private)`. All private repository entries must use abstract operational language.
