@@ -102,6 +102,21 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Real, live precedent, 2026-08-30:** an agent posted a "Status right now:" block in exactly this shape mid-session; Spencer, direct, quoting it verbatim: "this, this is how I always want you to talk to me." Landed after repeated earlier corrections the same session toward terser output ("terse pretty output", "give me links") -- this is the concrete format that finally matched what he wanted, not a guess.
 * **Not the same as**: a single-item answer or a genuinely narrative explanation, where forcing a bullet-list shape would fragment reasoning that needs to read as connected prose -- the convention applies to multi-item status/progress reporting specifically.
 
+### HEE Object Kinds
+* **Type:** Core Vocabulary
+* **Invariant Standard:** Every HEE object is a k8s-shaped YAML document -- `apiVersion: hee/v1`, `kind:`, `metadata:`, `spec:` -- validated by `hee-lint`. The active kinds are fixed by `human-execution-engine`'s `hee/contracts/hee.kind-registry.contract.v1.yaml`: **Card, Pill, Delta, Contract, Blueprint, Plan, Registry**. Adding an eighth is a promotion with real steps, not an inline invention.
+* **Card / Pill:** canonical in `docs/DOCUMENTATION_POLICY.md` -- *"Card for a durable typed record, Pill for lighter-weight WIP/evidence. Not authoritative on their own."*
+* **Blueprint:** same source -- *"Authoritative, non-terminal (`result: false`), changes must be deliberate and minimal."*
+* **Delta:** **UNDEFINED.** Listed as active, used, linted, and described nowhere in any repo. Searched 2026-09-02; zero definition-shaped sentences. Recorded as a gap rather than guessed at.
+* **Why this entry exists:** these seven are load-bearing everywhere and were absent from the SSoT this document claims to be. The cost is not hypothetical -- on 2026-09-02 an agent invented an expansion for an undefined acronym and committed it, because nothing defined it. An undefined term does not stay undefined; it gets guessed.
+
+### Thesis / Duople
+* **Type:** Core Vocabulary -- content states
+* **Invariant Standard:** HEE has two content states and the difference is load-bearing. A **Thesis** is a claim to be stress-tested: a raw idea, a proposal, a first draft, or a pasted external chat. Not wrong to have around, and not trustworthy on its own say-so. A **Duople** is that claim reduced to its binary-predicate, HEE-native form: verifiable, evaluable, evidence-backed. Canonical in `human-execution-engine`'s `README.md` and `docs/DOCUMENTATION_POLICY.md`.
+* **Which way the mistake runs:** writing a Thesis is not a demotion. Presenting one **as** a Duople, before it has earned that, is the actual error. Real instance, 2026-09-02: an open design question recovered from a chat log was written into `HEE_POLICY.md` as settled canon.
+* **How a Thesis becomes a Duople:** the `idea->footgun<->dogfood` cycle in `docs/guides/HEE_EXPLAINED.md`. Thesis and Duople name the two STATES; idea, footgun and dogfood name the WORK that moves a thing between them.
+* **Related:** `Graduation Signal` -- the same evidence-over-taste rule applied to tools rather than claims.
+
 ### Tool Maturity Ladder
 * **Type:** Engineering Convention
 * **Invariant Standard:** A new tool starts at the least capable language that does the real job and graduates only when it has actually outgrown it -- `library/bash/*.shfn.bash` (sourced function) -> `tooling/bin/*` sh/bash (standalone) -> `tooling/bin/*.py` -> a real `hee` subcommand -> Go/Rust/C. Canonical in `human-execution-engine`'s `prompts/PROMPTING_RULES.md` rule 13. Never start heavier "to be safe" or "for consistency."
