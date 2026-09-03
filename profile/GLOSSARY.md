@@ -104,18 +104,21 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 
 ### HEE Object Kinds
 * **Type:** Core Vocabulary
-* **Invariant Standard:** Every HEE object is a k8s-shaped YAML document -- `apiVersion: hee/v1`, `kind:`, `metadata:`, `spec:` -- validated by `hee-lint`. The active kinds are fixed by `human-execution-engine`'s `hee/contracts/hee.kind-registry.contract.v1.yaml`: **Card, Pill, Delta, Contract, Blueprint, Plan, Registry**. Adding an eighth is a promotion with real steps, not an inline invention.
-* **Card / Pill:** canonical in `docs/DOCUMENTATION_POLICY.md` -- *"Card for a durable typed record, Pill for lighter-weight WIP/evidence. Not authoritative on their own."*
-* **Blueprint:** same source -- *"Authoritative, non-terminal (`result: false`), changes must be deliberate and minimal."*
-* **Delta:** **UNDEFINED.** Listed as active, used, linted, and described nowhere in any repo. Searched 2026-09-02; zero definition-shaped sentences. Recorded as a gap rather than guessed at.
-* **Why this entry exists:** these seven are load-bearing everywhere and were absent from the SSoT this document claims to be. The cost is not hypothetical -- on 2026-09-02 an agent invented an expansion for an undefined acronym and committed it, because nothing defined it. An undefined term does not stay undefined; it gets guessed.
+* **Definition (this document is the SSoT for it):** Every HEE object is a k8s-shaped YAML document -- `apiVersion: hee/v1`, `kind:`, `metadata:`, `spec:` -- validated by `hee-lint`. Seven kinds are active: **Card, Pill, Delta, Contract, Blueprint, Plan, Registry**. `human-execution-engine`'s `hee/contracts/hee.kind-registry.contract.v1.yaml` enumerates them and governs promotion of an eighth; it is the enforcement point, not the definition.
+* **Card:** a durable typed record.
+* **Pill:** a lighter-weight WIP or evidence record.
+* **Blueprint:** authoritative doctrine, non-terminal (`result: false`). Changes are deliberate and minimal.
+* **Delta:** **at `idea` stage, deliberately.** Intended for metrics, and for building a merkle chain from other ratios. Design notes may not exist in any repo yet. Listed in `active_kinds` because the kind is claimed, not because it is built -- recorded honestly rather than back-filled with a plausible definition.
+* **Contract, Plan, Registry:** definitions owed here. Currently described only by usage.
+* **Authority does not come from the object.** See `Chain Authority` below -- this is the single most misread property of Cards and Pills.
+* **Downstream docs reference THIS entry.** `human-execution-engine`'s `docs/DOCUMENTATION_POLICY.md` carries a doc-type table that restates Card, Pill and Blueprint; that table should point here rather than define independently. Operator, 2026-09-02: *"glossary is ssot. make the other docs ref the glossary."*
 
-### Thesis / Duople
-* **Type:** Core Vocabulary -- content states
-* **Invariant Standard:** HEE has two content states and the difference is load-bearing. A **Thesis** is a claim to be stress-tested: a raw idea, a proposal, a first draft, or a pasted external chat. Not wrong to have around, and not trustworthy on its own say-so. A **Duople** is that claim reduced to its binary-predicate, HEE-native form: verifiable, evaluable, evidence-backed. Canonical in `human-execution-engine`'s `README.md` and `docs/DOCUMENTATION_POLICY.md`.
-* **Which way the mistake runs:** writing a Thesis is not a demotion. Presenting one **as** a Duople, before it has earned that, is the actual error. Real instance, 2026-09-02: an open design question recovered from a chat log was written into `HEE_POLICY.md` as settled canon.
-* **How a Thesis becomes a Duople:** the `idea->footgun<->dogfood` cycle in `docs/guides/HEE_EXPLAINED.md`. Thesis and Duople name the two STATES; idea, footgun and dogfood name the WORK that moves a thing between them.
-* **Related:** `Graduation Signal` -- the same evidence-over-taste rule applied to tools rather than claims.
+### Chain Authority
+* **Type:** Foundational Principle
+* **Invariant Standard:** A HEE object is **not authoritative on its own**, and that is the design rather than a limitation. Authority comes from a **GPG-bounded chain running from the lowest root source up to the hee epoch**. An object carries content; the chain carries authority. Operator, 2026-09-02: *"they are not auth by themselfs, they are auth by the gpg bounded chain from the lowest root source to the hee epoch."*
+* **The epoch does not exist yet.** `prompts/INIT.md` states the same thing from the other direction: HEE is a conceptual root and not yet a cryptographic one, because no identity in this fleet has a `.hee/index/_.yaml`. Tracked as fleet-ops#102 and fleet-ops#154. So every object today is unanchored **by construction**, awaiting a chain that is being built rather than missing one that was forgotten.
+* **Why this entry exists:** on 2026-09-02 an agent read *"Not authoritative on their own"* in the documentation policy, set it against the direction that web pages should be Cards, and reported a contradiction. There was none. Operator: *"if it feels awkward at first and you don't know why, it is probably hee. this works as designed."*
+* **The general form of that lesson:** awkwardness in this system is more often a property being enforced than a mistake being made. Check what the awkwardness buys before reporting it as a defect.
 
 ### Tool Maturity Ladder
 * **Type:** Engineering Convention
