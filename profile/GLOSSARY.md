@@ -120,6 +120,14 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Why this entry exists:** on 2026-09-02 an agent read *"Not authoritative on their own"* in the documentation policy, set it against the direction that web pages should be Cards, and reported a contradiction. There was none. Operator: *"if it feels awkward at first and you don't know why, it is probably hee. this works as designed."*
 * **The general form of that lesson:** awkwardness in this system is more often a property being enforced than a mistake being made. Check what the awkwardness buys before reporting it as a defect.
 
+### Thesis / Duople
+* **Type:** Core Vocabulary -- content states
+* **Definition (this document is the SSoT for it):** HEE has two content states and the difference is load-bearing. A **Thesis** is a claim to be stress-tested: a raw idea, a proposal, a first draft, or a pasted external chat. Not wrong to have around, and not trustworthy on its own say-so. A **Duople** is that claim reduced to its binary-predicate, HEE-native form: verifiable, evaluable, evidence-backed.
+* **Which way the mistake runs:** writing a Thesis is not a demotion. Presenting one **as** a Duople, before it has earned that, is the actual error. Real instance, 2026-09-02: an open design question recovered from a chat log was written into `HEE_POLICY.md` as settled canon.
+* **How a Thesis becomes a Duople:** the `idea->footgun<->dogfood` cycle. Thesis and Duople name the two STATES; idea, footgun and dogfood name the WORK that moves a thing between them.
+* **Not the same as `Chain Authority`.** A Duople has earned its content status. Authority is still carried by the GPG-bounded chain, not by the object. A verified claim in an unanchored object is exactly that -- verified and unanchored.
+* **Downstream docs reference THIS entry.** `human-execution-engine`'s `README.md` and `docs/DOCUMENTATION_POLICY.md` both restate these terms, and `docs/guides/HEE_EXPLAINED.md` carries the canonical notation for the cycle. All three should point here for the state definitions rather than defining independently.
+
 ### Tool Maturity Ladder
 * **Type:** Engineering Convention
 * **Invariant Standard:** A new tool starts at the least capable language that does the real job and graduates only when it has actually outgrown it -- `library/bash/*.shfn.bash` (sourced function) -> `tooling/bin/*` sh/bash (standalone) -> `tooling/bin/*.py` -> a real `hee` subcommand -> Go/Rust/C. Canonical in `human-execution-engine`'s `prompts/PROMPTING_RULES.md` rule 13. Never start heavier "to be safe" or "for consistency."
