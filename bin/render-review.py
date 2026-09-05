@@ -199,7 +199,7 @@ def get_pretty_html(repo: str, path: str, github_url: str | None = None) -> str:
 PAGE_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+{extra_head}<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}</title>
 <!-- Real favicon, hosted centrally -- swapping the icon means replacing
@@ -767,7 +767,7 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
                      diff_html: str = "", pretty_html: str | None = None,
                      commit_info: str | None = None, license_info: str | None = None,
                      site_name: str = "TCOS View", active_tab: str = "diff",
-                     github_url: str | None = None) -> str:
+                     github_url: str | None = None, extra_head: str = "") -> str:
     """Assemble one Gold page for a file. This is the function a downstream
     site imports instead of copying PAGE_TEMPLATE -- the GLOSSARY's Gold
     entry: "the source every other surface's Gold code should be ported
@@ -791,6 +791,7 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
         og_description=og_description, og_url=og_url,
         diff_html=diff_html, pretty_html=pretty_html, pygments_css=PYGMENTS_CSS,
         site_name=html.escape(site_name), diff_active=diff_active, pretty_active=pretty_active,
+        extra_head=(extra_head + "\n") if extra_head else "",
     )
 
 def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: str):
@@ -819,7 +820,7 @@ def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: s
             diff_html=diff_html,
             pretty_html=pretty_html,
             pygments_css=PYGMENTS_CSS,
-            site_name="TCOS View", diff_active=" active", pretty_active="",
+            site_name="TCOS View", diff_active=" active", pretty_active="", extra_head="",
         )
         out_path = out_dir / safe_repo / path
         out_path = out_path.with_name(out_path.name + ".html")
@@ -876,7 +877,7 @@ def main() -> int:
                 diff_html=diff_html,
                 pretty_html=pretty_html,
                 pygments_css=PYGMENTS_CSS,
-                site_name="TCOS View", diff_active=" active", pretty_active="",
+                site_name="TCOS View", diff_active=" active", pretty_active="", extra_head="",
             )
             (out_dir / slug).write_text(page, encoding="utf-8")
             print(f"{'new' if new else 'mod'}\t{repo_name}\t{path}\t{slug}")
