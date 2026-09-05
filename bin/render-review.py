@@ -209,7 +209,7 @@ PAGE_TEMPLATE = r"""<!DOCTYPE html>
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png">
-<meta property="og:site_name" content="TCOS View">
+<meta property="og:site_name" content="{site_name}">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{og_description}">
 <meta property="og:type" content="website">
@@ -367,7 +367,7 @@ pre.diff {{ background: var(--surface); border: 1px solid var(--line); border-ra
 <body>
 <div class="wrap">
   <div class="site-bar">
-    <a href="/" class="site-logo"><span class="mark">&#9670;</span> TCOS View</a>
+    <a href="/" class="site-logo"><span class="mark">&#9670;</span> {site_name}</a>
     <div class="toggles-row">
       <div class="theme-toggle">
         <span>Theme</span>
@@ -397,11 +397,11 @@ pre.diff {{ background: var(--surface); border: 1px solid var(--line); border-ra
   </div>
 
   <div class="tabs">
-    <div class="tab active" data-tab="diff">Diff</div>
-    <div class="tab" data-tab="pretty">Pretty</div>
+    <div class="tab{diff_active}" data-tab="diff">Diff</div>
+    <div class="tab{pretty_active}" data-tab="pretty">Pretty</div>
   </div>
-  <div class="panel active" id="panel-diff">{diff_html}</div>
-  <div class="panel" id="panel-pretty">{pretty_html}</div>
+  <div class="panel{diff_active}" id="panel-diff">{diff_html}</div>
+  <div class="panel{pretty_active}" id="panel-pretty">{pretty_html}</div>
 
   <a class="back" href="javascript:window.close()">&larr; close tab</a>
 </div>
@@ -761,6 +761,38 @@ GITHUB_ORG = "Twin-Cities-Open-Systems"  # real org name -- used to build real
 # 2026-08-27) -- not assumed.
 
 
+
+def render_file_page(repo: str, path: str, *, title: str, status_class: str, status_label: str,
+                     generated_iso: str, og_description: str, og_url: str,
+                     diff_html: str = "", pretty_html: str | None = None,
+                     commit_info: str | None = None, license_info: str | None = None,
+                     site_name: str = "TCOS View", active_tab: str = "diff",
+                     github_url: str | None = None) -> str:
+    """Assemble one Gold page for a file. This is the function a downstream
+    site imports instead of copying PAGE_TEMPLATE -- the GLOSSARY's Gold
+    entry: "the source every other surface's Gold code should be ported
+    from directly, never hand-copied and re-typed." Real first consumer:
+    resume's blog posts (resume#36 item 4 -- they were served as raw
+    markdown), which want the Pretty tab up front and their own site
+    name; the review/browse pages keep Diff-first and "TCOS View" by
+    default, so their output is unchanged."""
+    if pretty_html is None:
+        pretty_html = get_pretty_html(repo, path, github_url=github_url)
+    if commit_info is None:
+        commit_info = get_commit_info(repo, path, is_new=False)
+    if license_info is None:
+        license_info = detect_license(repo)
+    diff_active = " active" if active_tab == "diff" else ""
+    pretty_active = " active" if active_tab == "pretty" else ""
+    return PAGE_TEMPLATE.format(
+        title=title, repo=real_repo_name(repo).lstrip(".") or real_repo_name(repo), path=path,
+        status_class=status_class, status_label=status_label, generated_iso=generated_iso,
+        commit_info=commit_info, license_info=license_info,
+        og_description=og_description, og_url=og_url,
+        diff_html=diff_html, pretty_html=pretty_html, pygments_css=PYGMENTS_CSS,
+        site_name=html.escape(site_name), diff_active=diff_active, pretty_active=pretty_active,
+    )
+
 def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: str):
     repo_name = real_repo_name(repo)
     safe_repo = repo_name.lstrip(".") or repo_name
@@ -787,6 +819,7 @@ def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: s
             diff_html=diff_html,
             pretty_html=pretty_html,
             pygments_css=PYGMENTS_CSS,
+            site_name="TCOS View", diff_active=" active", pretty_active="",
         )
         out_path = out_dir / safe_repo / path
         out_path = out_path.with_name(out_path.name + ".html")
@@ -843,6 +876,7 @@ def main() -> int:
                 diff_html=diff_html,
                 pretty_html=pretty_html,
                 pygments_css=PYGMENTS_CSS,
+                site_name="TCOS View", diff_active=" active", pretty_active="",
             )
             (out_dir / slug).write_text(page, encoding="utf-8")
             print(f"{'new' if new else 'mod'}\t{repo_name}\t{path}\t{slug}")
