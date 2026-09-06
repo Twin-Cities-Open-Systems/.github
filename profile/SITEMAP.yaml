@@ -20,142 +20,102 @@
 # hee-view) as the real default source for its health check.
 
 sites:
-  # --- tcos.us (bare) -- Cloudflare Pages, tcos-www repo ---
   - url: https://tcos.us/
     repo: tcos-www
-    note: real, live -- marketing site home
+    note: "marketing site home"
   - url: https://tcos.us/activity
     repo: tcos-www
-    note: real, live -- org activity feed; found unlisted by hee view --crawl 2026-09-06
+    note: "org activity feed"
   - url: https://tcos.us/careers
     repo: tcos-www
-    note: real, live -- open roles, links into /contact?apply=; found unlisted by hee view --crawl 2026-09-06
+    note: "open roles; links into /contact?apply="
   - url: https://tcos.us/contact
     repo: tcos-www
-    note: real, live -- contact / sales / apply form; found unlisted by hee view --crawl 2026-09-06
+    note: "contact, sales and apply form"
   - url: https://tcos.us/ir
     repo: tcos-www
-    note: real, live -- investor relations; found unlisted by hee view --crawl 2026-09-06
+    note: "investor relations"
   - url: https://tcos.us/story
     repo: tcos-www
-    note: real, live -- our story; found unlisted by hee view --crawl 2026-09-06
+    note: "our story"
   - url: https://tcos.us/people
     repo: tcos-www
-    note: real, live -- fleet roster
+    note: "fleet roster"
   - url: https://tcos.us/people/spencer
     repo: tcos-www
-    note: real, live
+    note: "person page; redirects to spencer.blog.tcos.us"
   - url: https://tcos.us/people/touchy-claude
     repo: tcos-www
-    note: real, live (301 redirect, not yet confirmed to what)
+    note: "person page; redirects to touchy.blog.tcos.us"
   - url: https://tcos.us/contracts
     repo: tcos-www
-    note: "real, live -- confirmed 2026-08-30 (was NOT YET LIVE when this entry was first written). Real content cloned from view.lab.tcos.us/contracts.html per the original clone plan; that page remains the real source for future edits."
-
-  # --- spencer.media.tcos.us -- Cloudflare Pages, resume repo ---
+    note: "the ratified contracts"
   - url: https://spencer.media.tcos.us/
     repo: resume
-    note: real, live
+    note: "spencer's media host"
   - url: https://spencer.media.tcos.us/tux-tattoo/
     repo: resume
-    note: real, live -- real link bugs tracked in .github#47
-
-  # --- spencer.blog.tcos.us -- Cloudflare Pages, resume repo ---
+    note: "gallery item (exif pages under it)"
   - url: https://spencer.blog.tcos.us/
     repo: resume
-    note: real, live
+    note: "becomes a redirect to spencer.media.tcos.us at the next Pages deploy"
   - url: https://touchy.blog.tcos.us/
     repo: resume
-    note: "real, live -- confirmed 2026-08-30 via a real Cloudflare dns_records API sweep (closes the gap .github#70 flagged as blocking -- no real token existed for this before). touchy-claude's own per-person blog, parallel to spencer.blog.tcos.us. Missing from this inventory until now."
-
-  # --- blog.tcos.us / media.tcos.us -- category-level hubs, Cloudflare Pages, resume repo ---
+    note: "becomes a redirect to touchy.media.tcos.us at the next Pages deploy"
   - url: https://blog.tcos.us/
     repo: resume
-    note: "real, live -- confirmed 2026-08-30 via the same real dns_records sweep. Prod counterpart of the already-tracked blog.lab.tcos.us hub (blog-hub.html, 'every operator' list). Missing from this inventory until now."
+    note: "blog hub, every operator"
   - url: https://media.tcos.us/
     repo: resume
-    note: "real, live -- confirmed 2026-08-30 via the same real dns_records sweep. Prod counterpart of the already-tracked media.lab.tcos.us hub (media-hub.html, 'every operator' list). Missing from this inventory until now."
-
-  # --- external, non-Cloudflare, NOT pve-managed (DigitalOcean, 159.65.46.8) ---
-  # rtfm.tcos.us -- killed 2026-08-28: real Cloudflare A record
-  # (159.65.46.8) deleted via the API, confirmed gone against
-  # Cloudflare's own authoritative nameserver. No longer real, entry
-  # removed (was: "abandoned, real TLS cert mismatch, scrub for now").
-  # foo.tcos.us -- retired 2026-08-30: real, explicit decision to
-  # consolidate the droplet down to one identity. Its Cloudflare A
-  # record was deleted (confirmed gone against the authoritative NS),
-  # its nginx server blocks/systemd units/scripts removed, and the
-  # droplet's own OS hostname + DigitalOcean resource both renamed to
-  # man.tcos.us (fleet-ops#353). No longer real, entry removed.
+    note: "media hub, every operator"
   - url: https://man.tcos.us/
+    repo: fleet-ops
+    note: "the DigitalOcean droplet (159.65.46.8): gopher://man.tcos.us on 70 and this HTTP gateway; source fleet-ops/hosts/man-tcos-us"
   - url: https://man.tcos.us/gopher/1
     repo: fleet-ops
-    note: real, live -- the gopher-to-HTML gateway root; every /gopher/1/... page is under it; found unlisted by hee view --crawl 2026-09-06
-    repo: fleet-ops
-    note: "confirmed 2026-08-30: real, live -- now the droplet's sole identity (159.65.46.8) after foo.tcos.us's retirement, on the real default ports (70 gopher, 8070 HTTP gateway). Serves its own real content and OG-meta (previously it mistakenly served foo.tcos.us's page/cert -- that bug no longer applies, foo doesn't exist anymore to conflict with). Still real Gopher, not just HTTP -- gopher://man.tcos.us/ (no port suffix needed) now works directly since foo no longer competes for the default port. Source: fleet-ops/hosts/man-tcos-us/."
-
-  # crooked.tcos.us and its subtree (plex.tcos.us, and -- confirmed via
-  # the 2026-08-28 full CF zone dump -- ha/sabnzbd/sonarr/tautulli
-  # .crooked.tcos.us) are a separate real entity with their own IANA
-  # PEN. Deliberately off-limits to TCOS/HEE tooling and out of scope
-  # for this inventory by design -- not tracked here, not a gap.
-  # Confirmed, Spencer direct: "crooked seperate, has it's own PEN and
-  # off limts to tcos hee stuff." Real follow-up deferred to a future
-  # "finger plan" pass (.github#45), not tracked in todo.html.
-
-  # --- view.lab.tcos.us -- .github repo, bin/render-review.py + hand-authored pages ---
+    note: "gopher gateway root; every /gopher/1/... page is under it"
   - url: https://view.lab.tcos.us/
     repo: .github
-    note: real, live -- hand-authored, no source of record yet (.github#42)
+    note: "lab overview: containers, checks, links to the deeper pages (hand-authored, .github#87)"
   - url: https://view.lab.tcos.us/old-commits.html
     repo: .github
-    note: real, live -- 2026-09-05, generated by bin/render-old-commits.py (make lab-old-commits), every non-main branch on origin with a cleanup verdict (#84, #85); stays lab-only
+    note: "every non-main branch on origin with a cleanup verdict; generated (make lab-old-commits); lab-only"
   - url: https://view.lab.tcos.us/roadmap.html
     repo: .github
-    note: real, live -- hand-authored, no source of record yet (.github#42)
+    note: "Roadmap field-compliance view (hand-authored, .github#87)"
   - url: https://view.lab.tcos.us/review.html
     repo: .github
-    note: real, live -- hand-authored, no source of record yet (.github#42)
+    note: "consolidation review index (hand-authored, .github#87)"
   - url: https://view.lab.tcos.us/follow-up.html
     repo: .github
-    note: real, live -- hand-authored, no source of record yet (.github#42)
+    note: "running follow-up list (hand-authored, .github#87)"
   - url: https://view.lab.tcos.us/ian.html
     repo: .github
-    note: real, live -- hand-authored, no source of record yet (.github#42)
+    note: "hand-authored page (.github#87)"
   - url: https://view.lab.tcos.us/todo.html
     repo: .github
-    note: real, live -- hand-authored, no source of record yet (.github#42), stays lab-only, never promoted to prod
+    note: "lab-only todo, never promoted (hand-authored, .github#87)"
   - url: https://view.lab.tcos.us/plan.html
     repo: .github
-    note: real, live -- hand-authored, no source of record yet (.github#42)
+    note: "hand-authored page (.github#87)"
   - url: https://view.lab.tcos.us/contracts.html
     repo: .github
-    note: real, live -- the real source content for tcos.us/contracts once step 1 of the clone plan lands
-
-  # --- *.lab.tcos.us -- other real internal services (pve/haproxy/haproxy.cfg) ---
+    note: "source of tcos.us/contracts"
   - url: https://spencer.media.lab.tcos.us/
     repo: resume
-    note: real, live -- lab-side mirror, path-rewritten onto be_view's webroot per haproxy.cfg
+    note: "lab mirror of spencer.media.tcos.us"
   - url: https://lab.tcos.us/
     repo: tcos-www
-    note: "real, live -- Step 1 of the clone plan, 2026-08-28: bare apex is now a real dedicated haproxy route (real mirror of tcos-www), not the accidental default_backend be_view fallback it had before. Deployed via .github's Makefile (`hee make lab-tcos-www`)."
+    note: "lab mirror of tcos.us (make lab-tcos-www)"
   - url: https://spencer.blog.lab.tcos.us/
     repo: resume
-    note: "real, live -- Step 1 of the clone plan, 2026-08-28: same real path-rewrite pattern as spencer.media.lab.tcos.us. Deployed via .github's Makefile (`hee make lab-blog`)."
+    note: "redirects to spencer.media.lab.tcos.us"
   - url: https://man.lab.tcos.us/
     repo: fleet-ops
-    note: "real, live -- 2026-08-28, its own dedicated pve container (vmid 109, tcos-gopher-gateway, 10.0.0.172), not a be_view mirror. Real gopher-to-HTML render of live gopher://man.tcos.us:70 content (relay/gateway repointed 2026-08-30 after foo.tcos.us's retirement -- was foo.tcos.us:70, now stale since foo no longer exists). Real raw Gopher also works: gopher://man.lab.tcos.us. Source moved fleet-ops after this entry was first written -- human-execution-engine's pve/ is real TCOS infra, not platform-independent doctrine."
-  # foo.lab.tcos.us -- retired 2026-08-30, same real decision as
-  # foo.tcos.us: static mirror file removed from be_view's shared
-  # webroot (container 107), haproxy ACL/routing removed
-  # (pve/haproxy/haproxy.cfg, fleet-ops). No longer real, entry
-  # removed. Also found and fixed in the same pass: /www/foo/ian.html
-  # was a real, unrelated, misplaced file (a stray copy of
-  # view.lab.tcos.us/ian.html) sitting in the foo mirror directory --
-  # removed too, per Spencer's direct confirmation, not silently kept.
+    note: "gopher-to-HTML gateway, lab container 109; also gopher://man.lab.tcos.us"
   - url: https://blog.lab.tcos.us/
     repo: resume
-    note: "real, live -- 2026-08-28, category-level hub (blog-hub.html, 'every operator' list), real haproxy ACL+backend from fleet-ops#329. Missing from this inventory until now -- confirmed 200 via curl --resolve, added retroactively."
+    note: "blog hub, every operator (lab)"
   - url: https://media.lab.tcos.us/
     repo: resume
-    note: "real, live -- 2026-08-28, category-level hub (media-hub.html, 'every operator' list), real haproxy ACL+backend from fleet-ops#329. Missing from this inventory until now -- confirmed 200 via curl --resolve, added retroactively."
+    note: "media hub, every operator (lab)"
