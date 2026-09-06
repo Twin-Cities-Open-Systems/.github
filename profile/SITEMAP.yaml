@@ -24,6 +24,21 @@ sites:
   - url: https://tcos.us/
     repo: tcos-www
     note: real, live -- marketing site home
+  - url: https://tcos.us/activity
+    repo: tcos-www
+    note: real, live -- org activity feed; found unlisted by hee view --crawl 2026-09-06
+  - url: https://tcos.us/careers
+    repo: tcos-www
+    note: real, live -- open roles, links into /contact?apply=; found unlisted by hee view --crawl 2026-09-06
+  - url: https://tcos.us/contact
+    repo: tcos-www
+    note: real, live -- contact / sales / apply form; found unlisted by hee view --crawl 2026-09-06
+  - url: https://tcos.us/ir
+    repo: tcos-www
+    note: real, live -- investor relations; found unlisted by hee view --crawl 2026-09-06
+  - url: https://tcos.us/story
+    repo: tcos-www
+    note: real, live -- our story; found unlisted by hee view --crawl 2026-09-06
   - url: https://tcos.us/people
     repo: tcos-www
     note: real, live -- fleet roster
@@ -73,6 +88,9 @@ sites:
   # droplet's own OS hostname + DigitalOcean resource both renamed to
   # man.tcos.us (fleet-ops#353). No longer real, entry removed.
   - url: https://man.tcos.us/
+  - url: https://man.tcos.us/gopher/1
+    repo: fleet-ops
+    note: real, live -- the gopher-to-HTML gateway root; every /gopher/1/... page is under it; found unlisted by hee view --crawl 2026-09-06
     repo: fleet-ops
     note: "confirmed 2026-08-30: real, live -- now the droplet's sole identity (159.65.46.8) after foo.tcos.us's retirement, on the real default ports (70 gopher, 8070 HTTP gateway). Serves its own real content and OG-meta (previously it mistakenly served foo.tcos.us's page/cert -- that bug no longer applies, foo doesn't exist anymore to conflict with). Still real Gopher, not just HTTP -- gopher://man.tcos.us/ (no port suffix needed) now works directly since foo no longer competes for the default port. Source: fleet-ops/hosts/man-tcos-us/."
 
