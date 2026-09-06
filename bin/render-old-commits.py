@@ -100,8 +100,24 @@ def render(data_path: pathlib.Path, local_path: pathlib.Path | None, out_dir: pa
     repos = data["repos"]
     totals = {"safe to delete": 0, "open PR": 0, "decide": 0}
     parts = []
-    parts.append('<style>.oc td,.oc th{padding:4px 8px;vertical-align:top}.oc .ok{color:var(--ok,#2e7d32)}'
-                 '.oc .warn{color:var(--warn,#b26a00)}.oc .crit{color:var(--crit,#c62828)}.oc code{font-size:.9em}</style>')
+    # Phone-safe: the table scrolls inside its own box, never the page;
+    # long branch names and subjects wrap; under 700px each row stacks as
+    # a card. Operator, 2026-09-06: "mobile not good. the view port slides
+    # all over the place."
+    parts.append('<style>'
+                 '.oc-wrap{max-width:100%;overflow-x:auto}'
+                 '.oc{border-collapse:collapse;width:100%}'
+                 '.oc td,.oc th{padding:4px 8px;vertical-align:top;text-align:left;overflow-wrap:anywhere}'
+                 '.oc code{font-size:.9em;overflow-wrap:anywhere}'
+                 '.oc .ok{color:var(--ok,#2e7d32)}.oc .warn{color:var(--warn,#b26a00)}.oc .crit{color:var(--crit,#c62828)}'
+                 '@media (max-width:700px){'
+                 '.oc thead{display:none}'
+                 '.oc,.oc tbody,.oc tr,.oc td{display:block;width:100%;box-sizing:border-box}'
+                 '.oc tr{border-top:1px solid var(--line,#ddd);padding:6px 0}'
+                 '.oc td{padding:1px 0}'
+                 '.oc td:first-child{font-weight:600}'
+                 '}'
+                 '</style>')
     parts.append(f'<p>Every branch on origin other than <code>main</code>, across {len(repos)} repos, '
                  f'as fetched from <code>{html.escape(data["host"])}</code> at {html.escape(data["generated"])}. '
                  'Verdicts: <b class="ok">safe to delete</b> = merged PR, nothing ahead of main, or identical tree; '
@@ -113,8 +129,8 @@ def render(data_path: pathlib.Path, local_path: pathlib.Path | None, out_dir: pa
         parts.append(f'<h2 id="{html.escape(repo)}">{html.escape(repo)} <small>({len(rows)}: '
                      f'<span class="crit">{counts["decide"]} decide</span>, <span class="warn">{counts["open PR"]} open PR</span>, '
                      f'<span class="ok">{counts["safe to delete"]} safe to delete</span>)</small></h2>')
-        parts.append('<div style="overflow-x:auto"><table class="oc"><tr><th>verdict</th><th>branch</th><th>ahead/behind</th>'
-                     '<th>last commit</th><th>PR</th></tr>')
+        parts.append('<div class="oc-wrap"><table class="oc"><thead><tr><th>verdict</th><th>branch</th><th>ahead/behind</th>'
+                     '<th>last commit</th><th>PR</th></tr></thead><tbody>')
         base = f"https://github.com/{GITHUB_ORG}/{repo}"
         for r in rows:
             pr = (f'<a href="{base}/pull/{r["pr"]}">#{r["pr"]}</a> {html.escape(str(r["pr_state"]).lower())}' if r["pr"] else "")
@@ -123,7 +139,7 @@ def render(data_path: pathlib.Path, local_path: pathlib.Path | None, out_dir: pa
                          f'<td>+{r["ahead"]} / -{r["behind"]}</td>'
                          f'<td><a href="{base}/commit/{r["sha"]}"><code>{r["sha"][:7]}</code></a> {html.escape(r["date"])} '
                          f'{html.escape(r["subject"][:90])}</td><td>{pr}</td></tr>')
-        parts.append('</table></div>')
+        parts.append('</tbody></table></div>')
         for lb in local.get(repo, []):
             parts.append(f'<p class="crit">laptop-local only: <code>{html.escape(lb.get("branch", "?"))}</code> '
                          f'{html.escape(str(lb.get("note", "")))}</p>')
