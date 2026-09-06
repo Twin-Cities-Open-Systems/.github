@@ -1,0 +1,94 @@
+name: "Content Audit"
+# Operator, 2026-09-05, on learning a post reached the media site with no
+# scan: "make sure our ci/cd pipeline is auditing everything for all,
+# continuously." One workflow, two entry points:
+#
+#   workflow_call  -- any org repo calls this on push/PR; its own checkout
+#                     is scanned with tcos-audit's ruleset (scan_repo.py),
+#                     the same scanner behind `hee filter scan`.
+#   schedule       -- every 6 hours this repo sweeps EVERY org repo, so a
+#                     repo that never added the caller is still audited.
+#
+# tcos-audit is private. A GitHub-hosted runner cannot clone it with the
+# default GITHUB_TOKEN, so the scanner arrives via the org secret
+# TCOS_AUDIT_TOKEN (fine-grained PAT, contents:read on tcos-audit). Until
+# a human creates it, the scan step is skipped LOUDLY -- a WARNING with
+# the exact secret name, never a silent green (contract
+# publish-sanitization-v1: no silent skip). Flip condition for
+# fail-closed: the secret exists in the org.
+on:
+  workflow_call:
+    inputs:
+      diff_only:
+        description: "scan only the files changed against main (PRs); default full checkout"
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      TCOS_AUDIT_TOKEN:
+        required: false
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  scan-caller:
+    if: ${{ github.event_name != 'schedule' && github.event_name != 'workflow_dispatch' }}
+    name: "tcos-audit scan of this repo"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: target
+          fetch-depth: 0
+      - name: "Checkout tcos-audit (the ruleset)"
+        id: audit
+        if: ${{ secrets.TCOS_AUDIT_TOKEN != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: Twin-Cities-Open-Systems/tcos-audit
+          token: ${{ secrets.TCOS_AUDIT_TOKEN }}
+          path: tcos-audit
+      - name: "Scan"
+        if: ${{ steps.audit.outcome == 'success' }}
+        run: |
+          python3 tcos-audit/bin/scan_repo.py target ${{ inputs.diff_only && '--diff' || '' }}
+      - name: "No scanner -- say so"
+        if: ${{ steps.audit.outcome != 'success' }}
+        run: |
+          echo "::warning::⚠️ WARNING content-audit: org secret TCOS_AUDIT_TOKEN is not set; tcos-audit is private and could not be checked out. NOTHING WAS SCANNED. Create a fine-grained PAT (contents:read on tcos-audit) as an org Actions secret named TCOS_AUDIT_TOKEN."
+
+  sweep-org:
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    name: "sweep every org repo"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout tcos-audit (the ruleset)"
+        id: audit
+        if: ${{ secrets.TCOS_AUDIT_TOKEN != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: Twin-Cities-Open-Systems/tcos-audit
+          token: ${{ secrets.TCOS_AUDIT_TOKEN }}
+          path: tcos-audit
+      - name: "Clone and scan every repo the token can see"
+        if: ${{ steps.audit.outcome == 'success' }}
+        env:
+          GH_TOKEN: ${{ secrets.TCOS_AUDIT_TOKEN }}
+        run: |
+          set -u
+          rc=0
+          for r in $(gh repo list Twin-Cities-Open-Systems --limit 200 --json name --jq '.[].name'); do
+            [ "$r" = "tcos-audit" ] && continue
+            if ! gh repo clone "Twin-Cities-Open-Systems/$r" "repos/$r" -- --quiet --depth 1 2>/dev/null; then
+              echo "::warning::⚠️ WARNING content-audit: cannot clone $r with this token -- not scanned"
+              continue
+            fi
+            echo "=== $r ==="
+            python3 tcos-audit/bin/scan_repo.py "repos/$r" || { echo "::error::❌ CRITICAL content-audit: findings in $r"; rc=1; }
+          done
+          exit $rc
+      - name: "No scanner -- say so"
+        if: ${{ steps.audit.outcome != 'success' }}
+        run: |
+          echo "::warning::⚠️ WARNING content-audit: org secret TCOS_AUDIT_TOKEN is not set. NOTHING WAS SCANNED. Create it (fine-grained PAT, contents:read on tcos-audit and on every repo to sweep) as an org Actions secret."
