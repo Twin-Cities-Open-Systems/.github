@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -153,6 +154,45 @@ _COMMENT_PREFIX_BY_EXT = {
 }
 
 
+_BARE_URL = re.compile(r'(?<![\(<"\'`\]/])(https?://[^\s<>)\]"\'`]+[^\s<>)\]"\'`.,;:!?])')
+
+
+def _autolink_bare_urls(text: str) -> str:
+    out, in_fence = [], False
+    for line in text.splitlines(keepends=True):
+        if line.lstrip().startswith(("```", "~~~")):
+            in_fence = not in_fence
+        if in_fence or "](" in line and _BARE_URL.search(line) is None:
+            out.append(line); continue
+        # skip inline code spans
+        parts = line.split("`")
+        for i in range(0, len(parts), 2):
+            parts[i] = _BARE_URL.sub(r"<\1>", parts[i])
+        out.append("`".join(parts))
+    return "".join(out)
+
+
+_REL_HREF = re.compile(r'href="(?!https?://|mailto:|#|/|//)([^"#?]+)([#?][^"]*)?"')
+
+
+def _rewrite_relative_links(body: str, repo: str, path: str) -> str:
+    base = (Path(repo) / path).parent
+
+    def fix(m):
+        target, tail = m.group(1), m.group(2) or ""
+        if target.endswith("/") or target.endswith(".html"):
+            return m.group(0)
+        p = (base / target)
+        try:
+            p.resolve().relative_to(Path(repo).resolve())
+        except ValueError:
+            return m.group(0)
+        if p.is_file():
+            return f'href="{target}.html{tail}"'
+        return m.group(0)
+    return _REL_HREF.sub(fix, body)
+
+
 def get_pretty_html(repo: str, path: str, github_url: str | None = None) -> str:
     full = Path(repo) / path
     try:
@@ -176,9 +216,19 @@ def get_pretty_html(repo: str, path: str, github_url: str | None = None) -> str:
             extension_configs["codehilite"] = {
                 "css_class": "highlight", "guess_lang": False, "linenums": False,
             }
+        # Bare URLs become links. Python-Markdown only links <url>; posts and
+        # READMEs here write https://... in plain prose, and rendered they
+        # were dead text (operator, 2026-09-06: "the resume and post have
+        # no url links"). Wrap them before conversion; code fences/spans and
+        # already-linked forms are left alone.
+        text = _autolink_bare_urls(text)
         body = _markdown.markdown(
             text, extensions=extensions, extension_configs=extension_configs
         )
+        # Relative links to files in this repo point at the rendered page,
+        # which lives at <path>.html in the browse/diff trees (view.lab
+        # served 404s for hee/contracts/README.md -> ../../contracts/README.md).
+        body = _rewrite_relative_links(body, repo, path)
         return f'<div class="prose">{body}</div>'
 
     if highlight is not None:
