@@ -76,8 +76,6 @@ sites:
     repo: resume
     note: "claudesec-j1 posts; pages under it are covered"
     check: false
-    repo: resume
-    note: "gallery item (exif pages under it)"
   - url: https://spencer.blog.tcos.us/
     repo: resume
     note: "becomes a redirect to spencer.media.tcos.us at the next Pages deploy"
