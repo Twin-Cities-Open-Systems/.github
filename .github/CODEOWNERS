@@ -4,7 +4,7 @@
 # ==============================================================================
 
 # Global Fallback: Spencer Butler owns all organizational trunks by default
-*       @spencerbutler # Replace with your exact GitHub handle or Organization Team Name
+*       @spencerbutler
 
 # Infrastructure & Automation Guardrails
 /bin/   @spencerbutler
