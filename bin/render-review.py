@@ -644,10 +644,21 @@ def real_repo_name(repo: str) -> str:
     return resolved.name
 
 
+def github_repo_url(repo: str) -> str:
+    """https://github.com/<org>/<repo> for a checkout -- the org's own
+    convention (every repo lives at github.com/GITHUB_ORG/<dirname>)."""
+    name = real_repo_name(repo)
+    return f"https://github.com/{GITHUB_ORG}/{name.lstrip('.') or name}"
+
+
 def get_commit_info(repo: str, path: str, is_new: bool) -> str:
     """Real commit SHA this page's content reflects, or an honest
-    'uncommitted' label -- never a fabricated/assumed commit."""
-    head_sha = sh(["git", "rev-parse", "--short", "HEAD"], cwd=repo).strip()
+    'uncommitted' label -- never a fabricated/assumed commit. The SHA is
+    a link to the commit on GitHub (operator, 2026-09-05: "commit has no
+    link"); the uncommitted labels stay plain text, there is nothing to
+    link to yet."""
+    full_sha = sh(["git", "rev-parse", "HEAD"], cwd=repo).strip()
+    head_sha = full_sha[:7]
     if not head_sha:
         return "no commits yet"
     if is_new:
@@ -655,7 +666,7 @@ def get_commit_info(repo: str, path: str, is_new: bool) -> str:
     dirty = sh(["git", "status", "--porcelain", "--", path], cwd=repo).strip()
     if dirty:
         return f"uncommitted changes (HEAD {head_sha})"
-    return head_sha
+    return f'<a href="{github_repo_url(repo)}/commit/{full_sha}">{head_sha}</a>'
 
 
 _LICENSE_CACHE: dict[str, str] = {}
@@ -702,6 +713,26 @@ def detect_license(repo: str) -> str:
 
     _LICENSE_CACHE[key] = result
     return result
+
+
+# The org-wide license, for any repo that carries no LICENSE of its own.
+# Operator, 2026-09-05: "we need to make sure there is always a link to
+# our gpl in tcos/.github". The file is the canonical GPL-3.0 text.
+ORG_LICENSE_REPO = ".github"
+ORG_LICENSE_LABEL = "GPL-3.0"
+
+
+def license_link(repo: str) -> str:
+    """detect_license as footer HTML: the repo's own LICENSE, linked, when
+    it has one; otherwise the org-wide LICENSE, linked and labeled as
+    such -- never an unlinked "no LICENSE file found"."""
+    label = detect_license(repo)
+    root = Path(repo).resolve()
+    for name in ("LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING"):
+        if (root / name).is_file():
+            return f'<a href="{github_repo_url(repo)}/blob/main/{name}">{html.escape(label)}</a>'
+    org_url = f"https://github.com/{GITHUB_ORG}/{ORG_LICENSE_REPO}/blob/main/LICENSE"
+    return f'<a href="{org_url}">{ORG_LICENSE_LABEL}</a> (org-wide; this repo carries no LICENSE)'
 
 
 # Skip vendored/binary/build-output dirs when walking a whole tree -- real
@@ -781,7 +812,7 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
     if commit_info is None:
         commit_info = get_commit_info(repo, path, is_new=False)
     if license_info is None:
-        license_info = detect_license(repo)
+        license_info = license_link(repo)
     diff_active = " active" if active_tab == "diff" else ""
     pretty_active = " active" if active_tab == "pretty" else ""
     return PAGE_TEMPLATE.format(
@@ -799,7 +830,7 @@ def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: s
     safe_repo = repo_name.lstrip(".") or repo_name
     if not subdirs:
         subdirs = DEFAULT_BROWSE_SUBDIRS_BY_REPO.get(safe_repo, ["docs"])
-    license_info = detect_license(repo)
+    license_info = license_link(repo)
     for path in iter_tree_files(repo, subdirs):
         diff_html = get_diff_html(repo, path, new=False)
         github_url = f"https://github.com/{GITHUB_ORG}/{safe_repo}/blob/main/{path}"
@@ -852,7 +883,7 @@ def main() -> int:
 
     for repo in args.repos:
         repo_name = real_repo_name(repo)
-        license_info = detect_license(repo)
+        license_info = license_link(repo)
 
         for status, path in git_status(repo):
             if is_deleted(status):
