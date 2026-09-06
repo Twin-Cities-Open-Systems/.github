@@ -28,7 +28,10 @@ scripting-header rule was already duplicated here -- the canonical copy is
   drift and silent lockouts when rulesets were armed; centralizing fixed it.
   Measured 2026-09-06: four repos still carried a local file (thesis-engine
   and glass-ops naming an agent as owner of everything, fleet-ops naming
-  the same owner as the fallback); removed. The one deliberate local file
+  the same owner as the fallback); removed by PR in each repo. The old
+  `bin/purge_all_repo_codeowners_in_favor_of_org_root.bash` did the same
+  as a bare `rm -f` in every checkout with no commit, and would have
+  taken the deliberate file below with it; retired. The one deliberate local file
   is human-execution-engine's, which adds a SecOps reviewer on the
   doctrine paths (contracts, blueprints, schemas, registries; hee#196).
   `require_code_owner_reviews` is off everywhere, so CODEOWNERS only

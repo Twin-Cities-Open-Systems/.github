@@ -1,13 +1,6 @@
-# ==============================================================================
-# TCOS Centralized Global Code Owners Policy
-# Enforces automated review assignments across all organization repositories.
-# ==============================================================================
-
-# Global Fallback: Spencer Butler owns all organizational trunks by default
-*       @spencerbutler
-
-# Infrastructure & Automation Guardrails
-/bin/   @spencerbutler
-
-# Proprietary Compute Core Protection
-/core/  @spencerbutler
+# TCOS org fallback CODEOWNERS -- applies to every repo that has none of its
+# own (ORG_SETUP.md). One rule: the OPER owns the trunk. Path rules that
+# named directories no repo has (/core/) or that only repeated this line
+# (/bin/) were removed 2026-09-06. require_code_owner_reviews is off
+# everywhere, so this auto-requests a reviewer; it never blocks a merge.
+*   @spencerbutler
