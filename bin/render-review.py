@@ -264,7 +264,7 @@ PAGE_TEMPLATE = r"""<!DOCTYPE html>
 <meta property="og:description" content="{og_description}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{og_url}">
-<meta name="twitter:card" content="summary">
+{og_image_html}<meta name="twitter:card" content="{twitter_card}">
 <meta name="description" content="{og_description}">
 <link rel="canonical" href="{og_url}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -891,6 +891,21 @@ GITHUB_ORG = "Twin-Cities-Open-Systems"  # real org name -- used to build real
 
 
 
+def og_image_tags(og_image: str | None, size: tuple[int, int] = (1200, 630), alt: str = "") -> dict:
+    """og:image + size + alt, and the large-image Twitter card, when a page
+    has a real preview image; otherwise nothing and a plain summary card.
+    A post had no og:image at all until 2026-09-06 (operator: "this will
+    work for all posts, now and future, confirm")."""
+    if not og_image:
+        return {"og_image_html": "", "twitter_card": "summary"}
+    w, h = size
+    tags = (f'<meta property="og:image" content="{html.escape(og_image)}">\n'
+            f'<meta property="og:image:width" content="{w}">\n<meta property="og:image:height" content="{h}">\n'
+            + (f'<meta property="og:image:alt" content="{html.escape(alt)}">\n' if alt else "")
+            + f'<meta name="twitter:image" content="{html.escape(og_image)}">\n')
+    return {"og_image_html": tags, "twitter_card": "summary_large_image"}
+
+
 def header_links(repo: str, path: str, status_class: str, status_label: str,
                  github_url: str | None = None, label_url: str | None = None) -> dict:
     """The header's three texts as real links: the repo name to the repo on
@@ -914,7 +929,8 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
                      commit_info: str | None = None, license_info: str | None = None,
                      site_name: str = "TCOS View", active_tab: str = "diff",
                      github_url: str | None = None, extra_head: str = "",
-                     label_url: str | None = None) -> str:
+                     label_url: str | None = None, og_image: str | None = None,
+                     og_image_size: tuple[int, int] = (1200, 630), og_image_alt: str = "") -> str:
     """Assemble one Gold page for a file. This is the function a downstream
     site imports instead of copying PAGE_TEMPLATE -- the GLOSSARY's Gold
     entry: "the source every other surface's Gold code should be ported
@@ -940,6 +956,7 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
         site_name=html.escape(site_name), diff_active=diff_active, pretty_active=pretty_active,
         extra_head=(extra_head + "\n") if extra_head else "",
         **header_links(repo, path, status_class, status_label, github_url, label_url),
+        **og_image_tags(og_image, og_image_size, og_image_alt),
     )
 
 def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: str):
@@ -961,6 +978,7 @@ def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: s
             status_class="browse",
             status_label="browse",
             **header_links(repo, path, "browse", "browse", github_url),
+            **og_image_tags(None),
             generated_iso=generated_iso,
             commit_info=commit_info,
             license_info=license_info,
@@ -1020,6 +1038,7 @@ def main() -> int:
                 status_label="new" if new else "modified",
                 **header_links(repo, path, "new" if new else "mod", "new" if new else "modified",
                                f"https://github.com/{GITHUB_ORG}/{repo_name.lstrip('.') or repo_name}/blob/main/{path}"),
+                **og_image_tags(None),
                 generated_iso=generated_iso,
                 commit_info=commit_info,
                 license_info=license_info,
