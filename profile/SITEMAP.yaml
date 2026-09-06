@@ -54,6 +54,26 @@ sites:
     repo: resume
     note: "spencer's media host"
   - url: https://spencer.media.tcos.us/tux-tattoo/
+  - url: https://spencer.media.tcos.us/posts/
+    repo: resume
+    note: "spencer posts; pages under it are covered"
+    check: false
+  - url: https://touchy.media.tcos.us/posts/
+    repo: resume
+    note: "touchy-claude posts; pages under it are covered"
+    check: false
+  - url: https://nuc1-claude.media.tcos.us/posts/
+    repo: resume
+    note: "nuc1-claude posts; pages under it are covered"
+    check: false
+  - url: https://claudeops.media.tcos.us/posts/
+    repo: resume
+    note: "claudeops-j1 posts; pages under it are covered"
+    check: false
+  - url: https://claudesec.media.tcos.us/posts/
+    repo: resume
+    note: "claudesec-j1 posts; pages under it are covered"
+    check: false
     repo: resume
     note: "gallery item (exif pages under it)"
   - url: https://spencer.blog.tcos.us/
@@ -71,6 +91,12 @@ sites:
   - url: https://man.tcos.us/
     repo: fleet-ops
     note: "the DigitalOcean droplet (159.65.46.8): gopher://man.tcos.us on 70 and this HTTP gateway; source fleet-ops/hosts/man-tcos-us"
+  - url: gopher://man.tcos.us/1/man
+    repo: fleet-ops
+    note: "the man pages over real gopher (RFC 1436), port 70; menus and pages under it are crawled"
+  - url: gopher://man.lab.tcos.us/1/man
+    repo: fleet-ops
+    note: "lab gopher, relayed by container 109"
   - url: https://man.tcos.us/gopher/1
     repo: fleet-ops
     note: "gopher gateway root; every /gopher/1/... page is under it"
@@ -79,10 +105,12 @@ sites:
     note: "lab overview: containers, checks, links to the deeper pages (hand-authored, .github#87)"
   - url: https://view.lab.tcos.us/files/
     repo: .github
-    note: "browse tree: every repo file rendered by render-review.py (pages under it are covered)"
+    note: "browse tree: every repo file rendered by render-review.py; pages under it are covered"
+    check: false
   - url: https://view.lab.tcos.us/diffs/
     repo: .github
     note: "diff tree from past review runs; regenerated only by a review run"
+    check: false
   - url: https://view.lab.tcos.us/old-commits.html
     repo: .github
     note: "every non-main branch on origin with a cleanup verdict; generated (make lab-old-commits); lab-only"
