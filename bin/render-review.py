@@ -450,7 +450,7 @@ pre.diff {{ background: var(--surface); border: 1px solid var(--line); border-ra
   <p class="meta">{chip_html}</p>
   <div class="lu-row">
     <span><b>lu:</b> <time class="lu-iso" datetime="{generated_iso}">{generated_iso}</time> &middot; <span class="lu-human"></span> &middot; <span class="lu-delta"></span></span>
-    <span><b>commit:</b> {commit_info}</span>
+    <span><b>commit:</b> {commit_info}</span> &middot; <span><b>release:</b> {release_info}</span>
     <span><b>license:</b> {license_info}</span>
   </div>
 
@@ -749,6 +749,32 @@ def github_repo_url(repo: str) -> str:
     return f"https://github.com/{GITHUB_ORG}/{name.lstrip('.') or name}"
 
 
+def get_release_info(repo: str) -> str:
+    """The release this build belongs to, beside the commit on the lu row.
+    RELEASE_VERSION (set by hee release promote on the stage) wins; else
+    `git describe --tags --match v*`: exactly a tag on a release commit,
+    v1.0.0-3-gb0db861 when three commits past it; no v* tag at all ->
+    "unreleased (sha)", never an invented version. Operator, 2026-09-06:
+    "add/update our lu: line for the release"."""
+    import os as _os
+    ver = _os.environ.get("RELEASE_VERSION")
+    if not ver:
+        try:
+            ver = sh(["git", "describe", "--tags", "--match", "v*", "--always"], cwd=repo).strip()
+        except Exception:  # noqa: BLE001
+            ver = ""
+    if not ver:
+        return "unknown"
+    base = github_repo_url(repo)
+    m = re.fullmatch(r"(v\d+\.\d+\.\d+)(?:-(\d+)-g([0-9a-f]+))?", ver)
+    if not m:
+        return f"unreleased ({html.escape(ver)})"
+    tag, ahead, sha = m.groups()
+    if not ahead:
+        return f'<a href="{base}/releases/tag/{tag}">{tag}</a>'
+    return f'<a href="{base}/compare/{tag}...{sha}">{html.escape(ver)}</a> ({ahead} after {tag})'
+
+
 def get_commit_info(repo: str, path: str, is_new: bool) -> str:
     """Real commit SHA this page's content reflects, or an honest
     'uncommitted' label -- never a fabricated/assumed commit. The SHA is
@@ -948,6 +974,7 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
     diff_active = " active" if active_tab == "diff" else ""
     pretty_active = " active" if active_tab == "pretty" else ""
     return PAGE_TEMPLATE.format(
+        release_info=get_release_info(repo),
         title=title, repo=real_repo_name(repo).lstrip(".") or real_repo_name(repo), path=path,
         status_class=status_class, status_label=status_label, generated_iso=generated_iso,
         commit_info=commit_info, license_info=license_info,
@@ -972,6 +999,7 @@ def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: s
         commit_info = get_commit_info(repo, path, is_new=False)
         og_url = f"https://view.lab.tcos.us/files/{safe_repo}/{path}.html"
         page = PAGE_TEMPLATE.format(
+        release_info=get_release_info(repo),
             title=f"{path} -- {safe_repo}",
             repo=safe_repo,
             path=path,
@@ -1031,6 +1059,7 @@ def main() -> int:
             slug = slug_for(repo_name, path)
             og_url = f"https://view.lab.tcos.us/diffs/{slug}"
             page = PAGE_TEMPLATE.format(
+        release_info=get_release_info(repo),
                 title=f"{path} -- {repo_name}",
                 repo=repo_name,
                 path=path,
