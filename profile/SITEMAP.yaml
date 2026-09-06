@@ -54,6 +54,8 @@ sites:
     repo: resume
     note: "spencer's media host"
   - url: https://spencer.media.tcos.us/tux-tattoo/
+    repo: resume
+    note: "gallery item; exif pages under it are covered"
   - url: https://spencer.media.tcos.us/posts/
     repo: resume
     note: "spencer posts; pages under it are covered"
