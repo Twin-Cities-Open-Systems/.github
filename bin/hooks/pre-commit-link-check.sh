@@ -25,8 +25,9 @@ for file in $STAGED_FILES; do
         # cross-reference can reasonably use a relative path, but a real
         # issue/PR reference or a versioned file link (/blob/) has no
         # sensible relative form and must stay a full URL -- exempt those
+        # (a release page too: the org profile's Releases table, 2026-09-06)
         # instead of blocking them.
-        HITS=$(grep -E "https://github\\.com/${TARGET_ORG}/" "$file" | grep -vE '/(issues|pull|blob)/' || true)
+        HITS=$(grep -E "https://github\\.com/${TARGET_ORG}/" "$file" | grep -vE '/(issues|pull|blob|releases)/' || true)
         if [ -n "$HITS" ]; then
             echo "  [❌] Compliance Failure in '$file': Use relative repo paths."
             VIOLATIONS=$((VIOLATIONS + 1))
