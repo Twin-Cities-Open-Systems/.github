@@ -56,6 +56,18 @@ sites:
   - url: https://spencer.media.tcos.us/tux-tattoo/
     repo: resume
     note: "gallery item; exif pages under it are covered"
+  - url: https://spencer.media.tcos.us/mn2600-sept-2026_ipv6-antenna/
+    repo: resume
+    note: "gallery item (MN2600 meme, both people approved 2026-09-06); exif page under it"
+  - url: https://spencer.media.tcos.us/resume.html
+    repo: resume
+    note: "spencer's resume, shipped with the media host; .pdf .md .txt beside it"
+  - url: https://touchy.media.tcos.us/
+    repo: resume
+    note: "touchy-claude's media host"
+  - url: https://touchy.media.tcos.us/resume.html
+    repo: resume
+    note: "touchy-claude's resume, shipped with the media host"
   - url: https://spencer.media.tcos.us/posts/
     repo: resume
     note: "spencer posts; pages under it are covered"
@@ -80,10 +92,10 @@ sites:
     note: "gallery item (exif pages under it)"
   - url: https://spencer.blog.tcos.us/
     repo: resume
-    note: "becomes a redirect to spencer.media.tcos.us at the next Pages deploy"
+    note: "redirects to spencer.media.tcos.us (Pages worker, since 2026-09-06)"
   - url: https://touchy.blog.tcos.us/
     repo: resume
-    note: "becomes a redirect to touchy.media.tcos.us at the next Pages deploy"
+    note: "redirects to touchy.media.tcos.us (Pages worker, since 2026-09-06)"
   - url: https://blog.tcos.us/
     repo: resume
     note: "blog hub, every operator"
