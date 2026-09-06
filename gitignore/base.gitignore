@@ -1,0 +1,33 @@
+# The org's base .gitignore -- the secret paths every TCOS repo excludes.
+#
+# This lives here because .github is where org-wide GitHub administration
+# belongs. Note the real limit: GitHub inherits community health files from
+# this repo (CODE_OF_CONDUCT, CONTRIBUTING, the fallback CODEOWNERS) but it
+# does NOT inherit .gitignore. Nothing propagates this on its own. It is
+# synced by `hee check gitignore --fix`, which splices it into a repo between
+# markers so a later run replaces the block instead of appending a second one.
+#
+# Why it exists, 2026-09-06: a GPG-sealed pve admin credential was committed
+# to the public human-execution-engine repo inside a documentation typo PR.
+# The ignore rule that allowed it was `!.hee/secrets/*.gpg`, copied from
+# fleet-ops -- where it is correct, because that repo is private and really
+# does track 7 sealed files. In the public repo it had protected zero files.
+# The force-push did not undo it: the commit and blob are still served by
+# SHA. See fleet-ops#410.
+#
+# Deliberately narrow. A baseline that matches too much gets negated back by
+# whoever it inconveniences, and a negation is exactly what published that
+# credential.
+#
+# NEVER add a negation that re-includes one of these in a public repo.
+
+secrets/
+.hee/secrets/
+*.env
+*.pem
+*.p12
+*.pfx
+.netrc
+id_rsa
+id_ecdsa
+id_ed25519
