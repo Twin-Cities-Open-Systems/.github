@@ -77,6 +77,12 @@ sites:
   - url: https://view.lab.tcos.us/
     repo: .github
     note: "lab overview: containers, checks, links to the deeper pages (hand-authored, .github#87)"
+  - url: https://view.lab.tcos.us/files/
+    repo: .github
+    note: "browse tree: every repo file rendered by render-review.py (pages under it are covered)"
+  - url: https://view.lab.tcos.us/diffs/
+    repo: .github
+    note: "diff tree from past review runs; regenerated only by a review run"
   - url: https://view.lab.tcos.us/old-commits.html
     repo: .github
     note: "every non-main branch on origin with a cleanup verdict; generated (make lab-old-commits); lab-only"
