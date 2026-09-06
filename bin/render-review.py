@@ -445,9 +445,9 @@ pre.diff {{ background: var(--surface); border: 1px solid var(--line); border-ra
       </div>
     </div>
   </div>
-  <p class="eyebrow">{repo} &middot; {status_label}</p>
-  <h1>{path}</h1>
-  <p class="meta"><span class="chip {status_class}">{status_label}</span></p>
+  <p class="eyebrow">{repo_html} &middot; {status_label}</p>
+  <h1>{path_html}</h1>
+  <p class="meta">{chip_html}</p>
   <div class="lu-row">
     <span><b>lu:</b> <time class="lu-iso" datetime="{generated_iso}">{generated_iso}</time> &middot; <span class="lu-human"></span> &middot; <span class="lu-delta"></span></span>
     <span><b>commit:</b> {commit_info}</span>
@@ -891,12 +891,30 @@ GITHUB_ORG = "Twin-Cities-Open-Systems"  # real org name -- used to build real
 
 
 
+def header_links(repo: str, path: str, status_class: str, status_label: str,
+                 github_url: str | None = None, label_url: str | None = None) -> dict:
+    """The header's three texts as real links: the repo name to the repo on
+    GitHub, the path to the file (github_url, blob at a commit or main),
+    the status chip to wherever label_url says (a post's chip goes to the
+    listing it lives in). Operator, 2026-09-06, on a post page: "none of
+    this is a link". Without a URL a text stays a text -- never a dead
+    href."""
+    repo_name = real_repo_name(repo).lstrip(".") or real_repo_name(repo)
+    repo_html = f'<a href="https://github.com/{GITHUB_ORG}/{html.escape(repo_name)}">{html.escape(repo_name)}</a>'
+    path_html = f'<a href="{html.escape(github_url)}">{html.escape(path)}</a>' if github_url else html.escape(path)
+    chip = f'class="chip {status_class}"'
+    chip_html = (f'<a {chip} href="{html.escape(label_url)}">{status_label}</a>' if label_url
+                 else f'<span {chip}>{status_label}</span>')
+    return {"repo_html": repo_html, "path_html": path_html, "chip_html": chip_html}
+
+
 def render_file_page(repo: str, path: str, *, title: str, status_class: str, status_label: str,
                      generated_iso: str, og_description: str, og_url: str,
                      diff_html: str = "", pretty_html: str | None = None,
                      commit_info: str | None = None, license_info: str | None = None,
                      site_name: str = "TCOS View", active_tab: str = "diff",
-                     github_url: str | None = None, extra_head: str = "") -> str:
+                     github_url: str | None = None, extra_head: str = "",
+                     label_url: str | None = None) -> str:
     """Assemble one Gold page for a file. This is the function a downstream
     site imports instead of copying PAGE_TEMPLATE -- the GLOSSARY's Gold
     entry: "the source every other surface's Gold code should be ported
@@ -921,6 +939,7 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
         diff_html=diff_html, pretty_html=pretty_html, pygments_css=PYGMENTS_CSS,
         site_name=html.escape(site_name), diff_active=diff_active, pretty_active=pretty_active,
         extra_head=(extra_head + "\n") if extra_head else "",
+        **header_links(repo, path, status_class, status_label, github_url, label_url),
     )
 
 def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: str):
@@ -941,6 +960,7 @@ def render_browse(repo: str, subdirs: list[str], out_dir: Path, generated_iso: s
             path=path,
             status_class="browse",
             status_label="browse",
+            **header_links(repo, path, "browse", "browse", github_url),
             generated_iso=generated_iso,
             commit_info=commit_info,
             license_info=license_info,
@@ -998,6 +1018,8 @@ def main() -> int:
                 path=path,
                 status_class="new" if new else "mod",
                 status_label="new" if new else "modified",
+                **header_links(repo, path, "new" if new else "mod", "new" if new else "modified",
+                               f"https://github.com/{GITHUB_ORG}/{repo_name.lstrip('.') or repo_name}/blob/main/{path}"),
                 generated_iso=generated_iso,
                 commit_info=commit_info,
                 license_info=license_info,
