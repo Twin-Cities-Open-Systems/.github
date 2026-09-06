@@ -18,7 +18,7 @@ TCOS_WWW := $(HOME)/git/tcos-www
 RESUME   := $(HOME)/git/resume
 VIEW_VMID := 107
 
-.PHONY: lab lab-tcos-www lab-blog lab-verify release
+.PHONY: lab lab-tcos-www lab-blog lab-old-commits lab-verify release
 
 lab: lab-tcos-www lab-blog lab-verify
 
@@ -51,6 +51,21 @@ lab-blog:
 # Real, honest post-deploy check -- not a substitute for hee-view
 # --sites (which reads SITEMAP.yaml), just a fast sanity pass on the
 # two real targets this Makefile itself just touched.
+# old-commits.html -- every non-main branch on origin across the org, with
+# a cleanup verdict each (.github#84). `collect` needs the org checkouts
+# under $(HOME)/git and gh auth; `render` needs only the JSON. LOCAL is an
+# optional ndjson from `hee repo-refresh hygiene --json` run on another
+# machine (the laptop), merged in as "laptop-local only" rows.
+OLD_COMMITS_JSON ?= /tmp/old-commits.json
+LOCAL ?=
+lab-old-commits:
+	bin/render-old-commits.py collect --out $(OLD_COMMITS_JSON)
+	HEE_BRANDING=$${HEE_BRANDING:-$(HOME)/git/tcos-audit/policy/branding.card.v1.yaml} \
+		bin/render-old-commits.py render $(OLD_COMMITS_JSON) $(if $(LOCAL),--local $(LOCAL),) --out /tmp/lab-deploy-old-commits
+	scp /tmp/lab-deploy-old-commits/old-commits.html pve:/tmp/old-commits.html
+	ssh pve "pct push $(VIEW_VMID) /tmp/old-commits.html /www/old-commits.html"
+	@echo "view.lab.tcos.us/old-commits.html: $$(curl -s -o /dev/null -w '%{http_code}' https://view.lab.tcos.us/old-commits.html)"
+
 lab-verify:
 	@echo "lab.tcos.us:               $$(curl -s -o /dev/null -w '%{http_code}' https://lab.tcos.us/)"
 	@echo "lab.tcos.us/css/site.css:  $$(curl -s -o /dev/null -w '%{http_code}' https://lab.tcos.us/css/site.css)"
