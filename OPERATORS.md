@@ -26,7 +26,7 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
   reported, not guessed at; PRs are always out of scope (`Target date`
   is Issues-only). `--threshold-days` (default 59) is a real but **not
   yet confirmed** candidate — see
-  [`roadmap`](https://github.com/Twin-Cities-Open-Systems/roadmap)'s
+  [`roadmap`](https://github.com/Twin-Cities-Open-Systems/roadmap/blob/main/README.md)'s
   README for the open near/far-boundary question this default is
   standing in for. Real run, including a real mistake caught and fixed
   before it stuck (an earlier version targeted the wrong field
@@ -53,10 +53,7 @@ This doc is only what's specific to the scripts in this repo's `bin/`.
   a special case needing 4 `../` levels, not 1** — this tool's
   one-level default would break that specific file (see .github#21's
   fix history for why).
-- **`bin/purge_all_repo_codeowners_in_favor_of_org_root.bash`** —
-  deletes local `CODEOWNERS` files under `~/git/*` in favor of this
-  repo's org-default one. Only deletes **local checkout** files, does
-  not commit/push — a human still has to do that per-repo.
+- CODEOWNERS is the org fallback in `.github/CODEOWNERS`; per-repo copies were removed by PR on 2026-09-06 (ORG_SETUP.md). The old purge script that `rm -f`'d them in every checkout is retired.
 
 ## External research
 

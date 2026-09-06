@@ -26,6 +26,22 @@ scripting-header rule was already duplicated here -- the canonical copy is
 - One global fallback `CODEOWNERS` at `.github/CODEOWNERS` -- not a copy in
   every repo. Local per-repo `CODEOWNERS` files caused real maintenance
   drift and silent lockouts when rulesets were armed; centralizing fixed it.
+  Measured 2026-09-06: four repos still carried a local file (thesis-engine
+  and glass-ops naming an agent as owner of everything, fleet-ops naming
+  the same owner as the fallback); removed by PR in each repo. The old
+  purge script (`purge_all_repo_codeowners_in_favor_of_org_root.bash`, gone) did the same <!-- hee-check:refs-ok  retired file, named as history -->
+  as a bare `rm -f` in every checkout with no commit, and would have
+  taken the deliberate file below with it; retired. The one deliberate local file
+  is human-execution-engine's, which adds a SecOps reviewer on the
+  doctrine paths (contracts, blueprints, schemas, registries; hee#196).
+  `require_code_owner_reviews` is off everywhere, so CODEOWNERS only
+  auto-requests reviewers; it never lets an author approve their own PR.
+- The OPER is a **bypass actor** for required reviews on every protected
+  `main` (`bypass_pull_request_allowances.users: spencerbutler`, set
+  2026-09-06). GitHub never lets an author approve their own PR, so
+  without this the OPER's own one-line PRs needed an agent's approval;
+  with it they merge on the OPER's say, still through a PR (rule 1).
+  Agents are not bypass actors: their PRs still need the OPER.
 
 ## Local git config (once per machine)
 
