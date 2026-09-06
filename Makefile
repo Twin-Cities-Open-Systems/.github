@@ -18,7 +18,7 @@ TCOS_WWW := $(HOME)/git/tcos-www
 RESUME   := $(HOME)/git/resume
 VIEW_VMID := 107
 
-.PHONY: lab lab-tcos-www lab-blog lab-old-commits lab-verify release
+.PHONY: lab lab-tcos-www lab-blog lab-old-commits lab-tree-index lab-verify release
 
 lab: lab-tcos-www lab-blog lab-verify
 
@@ -65,6 +65,21 @@ lab-old-commits:
 	scp /tmp/lab-deploy-old-commits/old-commits.html pve:/tmp/old-commits.html
 	ssh pve "pct push $(VIEW_VMID) /tmp/old-commits.html /www/old-commits.html"
 	@echo "view.lab.tcos.us/old-commits.html: $$(curl -s -o /dev/null -w '%{http_code}' https://view.lab.tcos.us/old-commits.html)"
+
+# files/index.html and diffs/index.html -- busybox httpd lists no
+# directories, so the two trees review runs write to the view container
+# answered 404 at their roots while every page under them was live
+# (hee view --crawl, 2026-09-06). Built from what the container holds.
+TREE_JSON ?= /tmp/view-tree.json
+lab-tree-index:
+	bin/render-tree-index.py collect --out $(TREE_JSON)
+	HEE_BRANDING=$${HEE_BRANDING:-$(HOME)/git/tcos-audit/policy/branding.card.v1.yaml} \
+		bin/render-tree-index.py render $(TREE_JSON) --out /tmp/lab-deploy-tree-index
+	scp -q /tmp/lab-deploy-tree-index/files/index.html pve:/tmp/files-index.html
+	scp -q /tmp/lab-deploy-tree-index/diffs/index.html pve:/tmp/diffs-index.html
+	ssh pve "pct push $(VIEW_VMID) /tmp/files-index.html /www/files/index.html && pct push $(VIEW_VMID) /tmp/diffs-index.html /www/diffs/index.html"
+	@echo "view.lab.tcos.us/files/: $$(curl -s -o /dev/null -w '%{http_code}' https://view.lab.tcos.us/files/)"
+	@echo "view.lab.tcos.us/diffs/: $$(curl -s -o /dev/null -w '%{http_code}' https://view.lab.tcos.us/diffs/)"
 
 lab-verify:
 	@echo "lab.tcos.us:               $$(curl -s -o /dev/null -w '%{http_code}' https://lab.tcos.us/)"
