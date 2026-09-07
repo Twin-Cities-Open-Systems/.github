@@ -19,9 +19,19 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Legal-entity form:** In any public-facing context that needs the legal entity, not just the org name, use `Twin Cities Open Systems (TCOS), LLC` or the short form `TCOS (LLC)`. Authority for the entity's real identifiers (EIN, filing details, formation dates) lives in `tcos-plan-private`, never here.
 * **Identifier redaction (real invariant, not just a style note):** EIN, tax IDs, and legacy/superseded entity identifiers must never appear in this repo or any other public-facing surface -- state that they're tracked privately instead of naming or partially redacting them.
 
-### TCOS Private Enterprise Number (PEN)
-* **Type:** Real, externally-registered technical identifier
-* **Invariant Standard:** TCOS's real IANA-assigned Private Enterprise Number is **66550**, registered to "Twin Cities Open Systems - Operations LLC." Unlike an EIN or tax ID, a PEN is meant to be public -- it's the base OID arc (`1.3.6.1.4.1.66550`) any TCOS tooling uses when it needs a real, globally-unique identifier (SNMP MIBs, X.509 extensions, or similar namespaced metadata). Independently verifiable at any time against IANA's own registry: `https://www.iana.org/assignments/enterprise-numbers.txt`. Never invent or guess a substitute number -- 66550 is the one real, assigned value.
+### Private Enterprise Numbers (PENs)
+* **Type:** Real, externally-registered technical identifiers
+* **Invariant Standard:** TCOS holds **three** IANA-assigned Private Enterprise Numbers, not one. All three are real, all three are independently verifiable against IANA's own registry (`https://www.iana.org/assignments/enterprise-numbers.txt`), and they must never be reconciled into one another -- they name different things on purpose. Verified against the registry 2026-09-06:
+
+| PEN | registered to | scope |
+| :--- | :--- | :--- |
+| **66550** | Twin Cities Open Systems - Operations LLC | the org. The live inventory instance -- hosts, containers, pools, backups, agents, contracts. `OWNER-ROOT-MIB` is written under this arc. |
+| **66582** | Human Execution Engine | the portable schema any org adopts, generalized from 66550 **after** TCOS has dogfooded it |
+| **53723** | Crooked | personal. Out of scope for org work. |
+
+* **Base OID arc:** `1.3.6.1.4.1.<PEN>`. Unlike an EIN or tax ID, a PEN is meant to be public -- it is the arc any TCOS tooling uses when it needs a real, globally-unique identifier (SNMP MIBs, X.509 extensions, namespaced metadata).
+* **Sequencing, operator 2026-09-06:** *"we will dogfood tcos and then update the hee PEN."* Not in parallel. A schema published under 66582 before 66550 has actually run is a specification without an implementation.
+* **Never invent or guess a substitute number.** Recorded here because 66582 appeared **zero** times across every repo in the workspace when this entry was written, while 66550 appeared 89 times in 57 files -- a real assigned identifier the org owned and had never written down. An earlier version of this entry named 66550 as "the one real, assigned value", which was true when written and incomplete once the other two mattered.
 
 ### Determinism
 * **Type:** Core Execution Principle
