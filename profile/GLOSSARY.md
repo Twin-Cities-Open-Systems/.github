@@ -188,13 +188,28 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 
 ### Roster
 * **Type:** Registry Name — **Real, canonized 2026-09-10**
-* **Invariant Standard:** `roster` means `fleet-ops`'s `roster.json` and nothing else: the org's identity roster of people and accounts, their tiers and known gaps, which generates `WHO-WE-ARE.md` and `docs/fleet-directory.html` (`bin/generate-roster.py`) and is checked by `hee check roster`. Real trigger: a deploy flag named `--roster` and a generator named `roster-model` in [`human-execution-engine`#681](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/pull/681) meant the agent roster, while a search for `roster.json` on kiosk found eight checkouts of the people roster plus Claude Code's own `~/.claude/daemon/roster.json` (daemon state -- neither). Spencer, 2026-09-10: *"roster = roster.json / agent roster metadata.name: agent-roster"*.
+* **Invariant Standard:** `roster` means `fleet-ops`'s `roster.json` and nothing else: the org's identity roster of people and accounts, their tiers and known gaps, which generates `WHO-WE-ARE.md` and `docs/fleet-directory.html` (`the generate-roster script in fleet-ops' bin`) and is checked by `hee check roster`. Real trigger: a deploy flag named `--roster` and a generator named `roster-model` in [`human-execution-engine`#681](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/pull/681) meant the agent roster, while a search for `roster.json` on kiosk found eight checkouts of the people roster plus Claude Code's own `~/.claude/daemon/roster.json` (daemon state -- neither). Spencer, 2026-09-10: *"roster = roster.json / agent roster metadata.name: agent-roster"*.
 * **Not the same as:** `Agent Roster`. A tool pointed at the wrong one should fail closed, not guess: `roster.json` has no `spec.status`, so the agent-roster readers refuse it as unratified.
 
 ### Agent Roster
 * **Type:** Registry Name — **Real, canonized 2026-09-10**
 * **Invariant Standard:** `agent roster` means the HEE Registry whose `metadata.name` is `agent-roster` -- `fleet-ops`'s `hee/registries/agent-roster.registry.v1.yaml`, ratified and signed: the narrow-context agents that run on pve, each one's enumerated scope, and the model it runs. It is the single source of truth for an agent's model, and nothing commits a copy: `hee pve deploy` renders each agent container's model pin from it at deploy time, only after checking it is ratified and its signature verifies ([`fleet-ops`#462](https://github.com/Twin-Cities-Open-Systems/fleet-ops/pull/462)). Never shortened to bare "roster" -- in prose, flags, keys or identifiers say `agent roster`, `--agent-roster`, `agent_roster:`, `agent-roster-model`.
 * **Not the same as:** `Roster`; nor `Agent` (the machine-rights party), of which the agent roster lists the pve instances.
+
+### Agent Role
+* **Type:** Core Vocabulary -- identity
+* **Invariant Standard:** a named, permanent seat in the Agent Roster: `ci-triage`, `backlog-groomer`, `docs-keeper`, `pr-reviewer`, `media-hand`. The role carries the model pin, the scope, the hire-authority contract and the budget -- and every durable object that costs money or grants access: the Console workspace, the API key (the `hee cred` account `anthropic-<role>`), the Mercury debit card. Written as the roster name, lowercase, hyphenated. A role always needs filling; it outlives every container that fills it.
+* **Not the same as:** the Agent (instance) filling it today. Never suffix a role with an instance name in any billing or credential object (`ci-triage-herbert` is not a thing -- do not write it).
+
+### Agent (instance)
+* **Type:** Core Vocabulary -- identity
+* **Invariant Standard:** one container filling one Agent Role, named by the last token of its hostname, allocated from the `family-guy` pool by `hee name`: `herbert`. Written with its role when the role is not obvious from context: `ci-triage (herbert)`. It is a hostname and a field in the dispatch record, not a billing or credential object: rebuilding a role's container allocates the next pool name and changes nothing in the Console, the key store or the bank.
+* **Not the same as:** `Agent` (the machine-rights party, above -- an instance is one such agent's container); the container name `tcos-triage-herbert` (fleet identity -- what `pct list` and the allocation registry show; the middle token is the role's short form), or the role itself.
+
+### Agent accounting
+* **Type:** Invariant
+* **Invariant Standard:** capital and credentials attach to the **role**; attribution to the instance is derived, from the dispatch record (`.hee/dispatch/<job id>.yaml`: agent, vmid, ticket, cost per job). One Mercury checking account (`tcosagent`) funds one debit card per role; one Console workspace (or organization -- open decision, fleet-ops#491) per role; one sealed key per role. Console members are humans only (spencer: admin, touchy-claude: developer); an agent is never a member -- it is a workspace and a key.
+* **Footgun (why this is an invariant):** naming a workspace, key or card after the instance bakes a hostname into money. On the first rebuild you either re-mint and lose the role's spend history, or keep an object whose name lies. The second footgun is mixing: key per role but card per instance (or the reverse) makes the bank and the Console disagree about what a dollar was for. Operator, 2026-09-10: "are we allocating real capital to the role or to the agent fulfilling that role" -- the role.
 
 ### render view
 * **Type:** Design/UX System
