@@ -186,6 +186,16 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Type:** Role — **Human-Rights Party**
 * **Invariant Standard:** The human-rights party, paired with `Agent` (the machine-rights party) -- see that entry for the full rule and canonization citation. Already real, pre-existing usage across the org before this pairing was made explicit (`SRO` = *Single Responsible Operator*; `hee_git_ops.sh`'s own comments distinguish agent mutation gating from human/oper action) -- this entry doesn't introduce the word, it canonizes the distinction it draws against `Agent`.
 
+### Roster
+* **Type:** Registry Name — **Real, canonized 2026-09-10**
+* **Invariant Standard:** `roster` means `fleet-ops`'s `roster.json` and nothing else: the org's identity roster of people and accounts, their tiers and known gaps, which generates `WHO-WE-ARE.md` and `docs/fleet-directory.html` (`bin/generate-roster.py`) and is checked by `hee check roster`. Real trigger: a deploy flag named `--roster` and a generator named `roster-model` in [`human-execution-engine`#681](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/pull/681) meant the agent roster, while a search for `roster.json` on kiosk found eight checkouts of the people roster plus Claude Code's own `~/.claude/daemon/roster.json` (daemon state -- neither). Spencer, 2026-09-10: *"roster = roster.json / agent roster metadata.name: agent-roster"*.
+* **Not the same as:** `Agent Roster`. A tool pointed at the wrong one should fail closed, not guess: `roster.json` has no `spec.status`, so the agent-roster readers refuse it as unratified.
+
+### Agent Roster
+* **Type:** Registry Name — **Real, canonized 2026-09-10**
+* **Invariant Standard:** `agent roster` means the HEE Registry whose `metadata.name` is `agent-roster` -- `fleet-ops`'s `hee/registries/agent-roster.registry.v1.yaml`, ratified and signed: the narrow-context agents that run on pve, each one's enumerated scope, and the model it runs. It is the single source of truth for an agent's model, and nothing commits a copy: `hee pve deploy` renders each agent container's model pin from it at deploy time, only after checking it is ratified and its signature verifies ([`fleet-ops`#462](https://github.com/Twin-Cities-Open-Systems/fleet-ops/pull/462)). Never shortened to bare "roster" -- in prose, flags, keys or identifiers say `agent roster`, `--agent-roster`, `agent_roster:`, `agent-roster-model`.
+* **Not the same as:** `Roster`; nor `Agent` (the machine-rights party), of which the agent roster lists the pve instances.
+
 ### render view
 * **Type:** Design/UX System
 * **Invariant Standard:** The org's one UX/UI system, originated on `view.lab.tcos.us` -- teal accent (`#0d7d78` light / `#3fd4c8` dark), IBM Plex Sans (body) + JetBrains Mono (mono/labels), light/dark/auto toggle defaulting dark, card-based `section`/`.link-card` layout. Adopted as the default for reskinning any real surface; concrete precedent: resume#32 (blog-hub/media-hub) and fleet-ops#330 (foo/man gopher pages) both ported off it verbatim.
@@ -229,6 +239,8 @@ still open (see `view.lab.tcos.us/follow-up.html` #6).
 
 * **Instead of:** `credentials`, `resume profile`, `history`
   * **Use TCOS Standard:** `Pedigree` (when referring to founder backgrounds) or `Track Record` (when referring to repository execution history).
+* **Instead of:** `roster` (for the registry of pve agents and their models)
+  * **Use TCOS Standard:** `Agent Roster`. Bare `roster` is reserved for `roster.json`, the people roster.
 * **Instead of:** `cron job`, `task manager`, `script loop`
   * **Use TCOS Standard:** `Tick-Task Event` (when running high-frequency sub-millisecond execution loops via `tick-task`).
 * **Instead of:** `frontend`, `ui layout`, `desktop setup`
