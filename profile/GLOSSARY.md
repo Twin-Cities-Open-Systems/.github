@@ -230,6 +230,19 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Components ported so far, beyond the base set:** hover-preview (`shell/tc-hovercard.js`) -- fetches a real raw file on hover/focus, first 14 lines, cached. Pretty-print (`get_pretty_html()`) and EXIF-signed-image display are live on `view.lab.tcos.us` but not yet ported elsewhere -- open work, not declined work.
 * **Not the same as:** `Opus` (the generated-output layer), or the commodity in `market-thesis`/`thesis-engine`, which is unrelated and must not be renamed.
 
+
+### Day
+* **Type:** Accounting and scheduling unit
+* **Invariant Standard:** A day is a calendar day, 00:00:00 to 23:59:59, in a named IANA time zone. It is never "the last 24 hours" and never an implied UTC. Anything that sums, caps or reports by day names its zone and window next to the number, for example "spent 2026-09-11 00:00-23:59 CDT (America/Chicago)". Records keep their timestamps in UTC; the day only decides how they are grouped. On a daylight-saving change a day is 23 or 25 hours long, and that is correct.
+* **Which zone:** first hit wins -- `HEE_DAY_TZ` (a per-oper override in heerc), then the ledger repo's `.hee/config.yaml` `dispatch.day_tz`, then UTC. TCOS's dispatch ledger (fleet-ops) is `America/Chicago`. Implemented once, in `human-execution-engine`'s `library/py/hee_day`, and used by the dispatcher's daily cap and the agents-live feed.
+* **Real trigger, 2026-09-11:** at noon in Minneapolis, agents-live read "spent today $4.00 / $10". Both the dispatcher and the page counted records started on the current UTC date. UTC midnight is 19:00 CDT, so $3.92 of jobs run the previous evening (19:48-23:49 CDT) counted as today; the Minneapolis day had spent $0.09. Spencer: "we did not spend $4 today ... what is day? need to define in glossary, day vs session vs 00:00-23:59."
+* **Not the same as:** `Session` (below), which is a unit of work, not of time; or a rolling 24-hour window, which nothing in this org uses for caps.
+
+### Session
+* **Type:** Unit of work
+* **Invariant Standard:** One continuous working session of one party -- an agent's conversation from start to end, or an oper's working stretch. It is identified by its session id and its `Signature tag (sig_tag)`, not by a date: one session can cross midnight, and one day can hold many sessions. A session is never a spend window or a cap boundary; those are `Day`. "EOS" (end of session) and the session handoff close a session, not a day.
+* **Real precedent, 2026-09-11:** a single agent session ran from the evening of 2026-09-10 into the afternoon of 2026-09-11 CDT, spanning two days by any zone. Its dispatch spend belongs to whichever day each job started in, not to the session.
+
 ---
 
 ## 2. Acronym Expander
