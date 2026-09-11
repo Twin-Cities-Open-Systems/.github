@@ -209,7 +209,9 @@ def get_pretty_html(repo: str, path: str, github_url: str | None = None) -> str:
         # codehilite gives fenced code blocks the same real pygments
         # highlighting as standalone source files, not a flat <pre><code> --
         # "normal git markdown style" for a .md with real bash/etc blocks in it.
-        extensions = ["fenced_code", "tables", "sane_lists"]
+        # footnotes: [^id] references and definitions are core python-markdown;
+        # without it they print as literal text (resume thesis left-of-capex, 2026-09-11)
+        extensions = ["fenced_code", "tables", "sane_lists", "footnotes"]
         extension_configs = {}
         if highlight is not None:
             extensions.append("codehilite")
