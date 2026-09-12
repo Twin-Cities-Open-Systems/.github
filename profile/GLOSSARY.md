@@ -243,6 +243,15 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Invariant Standard:** One continuous working session of one party -- an agent's conversation from start to end, or an oper's working stretch. It is identified by its session id and its `Signature tag (sig_tag)`, not by a date: one session can cross midnight, and one day can hold many sessions. A session is never a spend window or a cap boundary; those are `Day`. "EOS" (end of session) and the session handoff close a session, not a day.
 * **Real precedent, 2026-09-11:** a single agent session ran from the evening of 2026-09-10 into the afternoon of 2026-09-11 CDT, spanning two days by any zone. Its dispatch spend belongs to whichever day each job started in, not to the session.
 
+
+### FRN (FCC Registration Number)
+* **Type:** Core Vocabulary -- external identifier, US government
+* **Invariant Standard:** The unique 10-digit number the FCC assigns through CORES, its COmmission REgistration System (https://www.fcc.gov/licensing-databases/commission-registration-system-fcc). Anyone who files an application or makes a payment with the FCC registers one first, and it identifies that person or entity in every FCC transaction after that. For amateur radio, the license application, a vanity call sign request and the FCC's application fee all go through it.
+* **An FRN is not a license.** It grants nothing on its own. A license, and the call sign that comes with it, is issued later and recorded against the FRN.
+* **Where it shows up here:** the FCC's bulk license data (ULS, `l_amat`) stores it in `EN.dat`, field 22. `hee callsign --frn` in tcos-plan-private looks up the licenses held under one.
+* **Real trigger, 2026-09-11:** Spencer asked "what is frn? make sure it is in glossary" after the ham license series used the term without defining it. His FRN is registered; that day's FCC license file held no license under it.
+* **Not the same as:** a call sign (issued with a license), an EIN (the IRS's business tax id), or the TCOS PEN (IANA's enterprise number, above).
+
 ---
 
 ## 2. Acronym Expander
@@ -257,6 +266,8 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 | **IP** | Intellectual Property | `tcos-plan-private` / `thesis-engine` |
 | **SSoT** | Single Source of Truth | Global Platform |
 | **PEN** | Private Enterprise Number (IANA-assigned) | Global Platform |
+| **FRN** | FCC Registration Number -- the 10-digit id the FCC's CORES assigns to anyone who files or pays with the FCC | `tcos-plan-private` (`hee callsign --frn`) |
+| **ULS** | Universal Licensing System -- the FCC's license database, published as bulk files (`l_amat` licenses, `a_amat` pending applications) | `tcos-plan-private` |
 | **SRO** | Single Responsible Operator -- one named human (Spencer Butler) has sole approval authority for a given scope, no committee/multi-party vote. Currently the real authority model for `human-execution-engine`'s CI governance rules (`docs/governance/operations/GOVERNANCE_OPERATIONS.md`) | `human-execution-engine` |
 | **RFC** | Request for Comment -- an open question needing real discussion before action, not yet a decision. Real doc type (`docs/rfc/`, per `docs/DOCUMENTATION_POLICY.md`) and a real GitHub label, both in active use | `human-execution-engine` |
 
