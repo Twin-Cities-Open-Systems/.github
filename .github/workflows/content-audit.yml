@@ -85,7 +85,13 @@ jobs:
               continue
             fi
             echo "=== $r ==="
-            python3 tcos-audit/bin/scan_repo.py "repos/$r" || { echo "::error::❌ CRITICAL content-audit: findings in $r"; rc=1; }
+            # scan_repo.py exits Nagios-style: 2 CRITICAL findings, 3 UNKNOWN nothing scanned.
+            s=0; python3 tcos-audit/bin/scan_repo.py "repos/$r" || s=$?
+            if [ "$s" -eq 2 ]; then
+              echo "::error::❌ CRITICAL content-audit: findings in $r"; rc=2
+            elif [ "$s" -ne 0 ]; then
+              echo "::error::❓ UNKNOWN content-audit: $r could not be scanned (exit $s)"; [ "$rc" -eq 2 ] || rc=3
+            fi
           done
           exit $rc
       - name: "No scanner -- say so"
