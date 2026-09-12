@@ -27,8 +27,8 @@ Releases and never edited by hand.
 <!-- releases:start -->
 | repo | latest | released | what |
 |---|---|---|---|
-| [resume](https://github.com/Twin-Cities-Open-Systems/resume/releases) | [v1.0.0](https://github.com/Twin-Cities-Open-Systems/resume/releases/tag/v1.0.0) | 2026-09-06 | Spencer Butler Resume |
-| [tcos-www](https://github.com/Twin-Cities-Open-Systems/tcos-www/releases) | [v1.0.0](https://github.com/Twin-Cities-Open-Systems/tcos-www/releases/tag/v1.0.0) | 2026-09-06 | Public marketing site for tcos.us — mission, product, people, contact |
+| [resume](https://github.com/Twin-Cities-Open-Systems/resume/releases) | [v1.3.0](https://github.com/Twin-Cities-Open-Systems/resume/releases/tag/v1.3.0) | 2026-09-12 | Spencer Butler Resume |
+| [tcos-www](https://github.com/Twin-Cities-Open-Systems/tcos-www/releases) | [v1.1.0](https://github.com/Twin-Cities-Open-Systems/tcos-www/releases/tag/v1.1.0) | 2026-09-11 | Public marketing site for tcos.us — mission, product, people, contact |
 | [tick-task](https://github.com/Twin-Cities-Open-Systems/tick-task/releases) | [v1.0.5](https://github.com/Twin-Cities-Open-Systems/tick-task/releases/tag/v1.0.5) | 2026-01-22 | Local-first task tracking application for personal and professional workflows with stable local API |
 | [human-execution-engine](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/releases) | [grave-gnu-recursfun-r2](https://github.com/Twin-Cities-Open-Systems/human-execution-engine/releases/tag/grave-gnu-recursfun-r2) | 2026-02-07 | Canonical Human Execution Engine (HEE) and Runtime (HEER) specification and reference implementation for deterministic human work orchestration |
 
