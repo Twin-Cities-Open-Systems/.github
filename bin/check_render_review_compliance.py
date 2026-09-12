@@ -252,23 +252,26 @@ def check_file(path: str) -> list:
 
 
 def main(argv: list) -> int:
+    """Exit codes are the Nagios plugin API the org uses everywhere: 0 OK,
+    2 CRITICAL (a page fails), 3 UNKNOWN (usage). Failures exited 1, which reads
+    as WARNING, and usage exited 2, which reads as CRITICAL."""
     if not argv:
-        print("usage: check_render_review_compliance.py <file> [file...]", file=sys.stderr)
-        return 2
+        print("UNKNOWN: usage: check_render_review_compliance.py <file> [file...]", file=sys.stderr)
+        return 3
 
     any_failed = False
     for path in argv:
         markup = extract_markup(path)
         failures = check_file_from_markup(markup)
         present, total = component_score(markup)
-        status = "FAIL" if failures else "PASS"
+        status = "CRITICAL" if failures else "OK"
         if failures:
             any_failed = True
         print(f"{status} {path} ({present}/{total} components)")
         for f in failures:
             print(f"  - {f}")
 
-    return 1 if any_failed else 0
+    return 2 if any_failed else 0
 
 
 if __name__ == "__main__":

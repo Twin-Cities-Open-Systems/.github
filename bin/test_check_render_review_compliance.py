@@ -7,6 +7,8 @@
 
 import os
 import tempfile
+import contextlib
+import io
 import unittest
 
 import check_render_review_compliance as cgo
@@ -215,6 +217,30 @@ class TestPyTemplateExtraction(unittest.TestCase):
         extracted = cgo.extract_markup_from_text(py_source, is_python=True)
         self.assertIn("og:site_name", extracted)
         self.assertIn("data-theme-choice", extracted)
+
+
+
+class TestExitCodes(unittest.TestCase):
+    """Nagios exits (operator, 2026-09-11: "should be nagios style everywhere")."""
+
+    def test_usage_is_unknown(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cgo.main([]), 3)
+
+    def test_good_page_is_ok_and_bad_page_is_critical(self):
+        with tempfile.TemporaryDirectory() as d:
+            good = os.path.join(d, "good.html")
+            bad = os.path.join(d, "bad.html")
+            with open(good, "w", encoding="utf-8") as f:
+                f.write(GOOD_HTML)
+            with open(bad, "w", encoding="utf-8") as f:
+                f.write("<html><head><title>x</title></head><body></body></html>")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(cgo.main([good]), 0)
+                self.assertEqual(cgo.main([bad]), 2)
+            self.assertIn("OK " + good, out.getvalue())
+            self.assertIn("CRITICAL " + bad, out.getvalue())
 
 
 if __name__ == "__main__":
