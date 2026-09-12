@@ -935,15 +935,26 @@ def og_image_tags(og_image: str | None, size: tuple[int, int] = (1200, 630), alt
 
 
 def header_links(repo: str, path: str, status_class: str, status_label: str,
-                 github_url: str | None = None, label_url: str | None = None) -> dict:
+                 github_url: str | None = None, label_url: str | None = None,
+                 repo_link: tuple[str, str] | None = None) -> dict:
     """The header's three texts as real links: the repo name to the repo on
     GitHub, the path to the file (github_url, blob at a commit or main),
     the status chip to wherever label_url says (a post's chip goes to the
     listing it lives in). Operator, 2026-09-06, on a post page: "none of
     this is a link". Without a URL a text stays a text -- never a dead
-    href."""
+    href.
+
+    repo_link=(href, label) replaces the first link for a site whose repo
+    name reads as something else. resume's repo is named "resume", so on a
+    media post the eyebrow read "resume" and went to GitHub; the operator
+    clicked it for his resume (2026-09-12: "both lab and prod are wrong
+    again for my resume link"). Review and browse pages pass nothing and
+    keep the repo link."""
     repo_name = real_repo_name(repo).lstrip(".") or real_repo_name(repo)
-    repo_html = f'<a href="https://github.com/{GITHUB_ORG}/{html.escape(repo_name)}">{html.escape(repo_name)}</a>'
+    if repo_link:
+        repo_html = f'<a href="{html.escape(repo_link[0])}">{html.escape(repo_link[1])}</a>'
+    else:
+        repo_html = f'<a href="https://github.com/{GITHUB_ORG}/{html.escape(repo_name)}">{html.escape(repo_name)}</a>'
     path_html = f'<a href="{html.escape(github_url)}">{html.escape(path)}</a>' if github_url else html.escape(path)
     chip = f'class="chip {status_class}"'
     chip_html = (f'<a {chip} href="{html.escape(label_url)}">{status_label}</a>' if label_url
@@ -958,7 +969,8 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
                      site_name: str = "TCOS View", active_tab: str = "diff",
                      github_url: str | None = None, extra_head: str = "",
                      label_url: str | None = None, og_image: str | None = None,
-                     og_image_size: tuple[int, int] = (1200, 630), og_image_alt: str = "") -> str:
+                     og_image_size: tuple[int, int] = (1200, 630), og_image_alt: str = "",
+                     repo_link: tuple[str, str] | None = None) -> str:
     """Assemble one Gold page for a file. This is the function a downstream
     site imports instead of copying PAGE_TEMPLATE -- the GLOSSARY's Gold
     entry: "the source every other surface's Gold code should be ported
@@ -984,7 +996,7 @@ def render_file_page(repo: str, path: str, *, title: str, status_class: str, sta
         diff_html=diff_html, pretty_html=pretty_html, pygments_css=PYGMENTS_CSS,
         site_name=html.escape(site_name), diff_active=diff_active, pretty_active=pretty_active,
         extra_head=(extra_head + "\n") if extra_head else "",
-        **header_links(repo, path, status_class, status_label, github_url, label_url),
+        **header_links(repo, path, status_class, status_label, github_url, label_url, repo_link),
         **og_image_tags(og_image, og_image_size, og_image_alt),
     )
 
