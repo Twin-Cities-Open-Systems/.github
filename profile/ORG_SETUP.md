@@ -43,6 +43,57 @@ scripting-header rule was already duplicated here -- the canonical copy is
   with it they merge on the OPER's say, still through a PR (rule 1).
   Agents are not bypass actors: their PRs still need the OPER.
 
+## Licensing
+
+**GPL-3.0 is the org default.** Operator, 2026-09-18. Every repo carries a real
+`LICENSE` file holding the verbatim upstream FSF text -- not a badge, not a
+README line, not an assumption. A repo that says otherwise has to say so in its
+own `LICENSE`, and say why.
+
+Verify the text rather than trusting a copy:
+
+```sh
+sha256sum LICENSE   # 3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986
+```
+
+Copy it verbatim. The GPL's own terms permit copying the license text but not
+modifying it, so a "GPL-ish" file edited to taste is neither the GPL nor
+enforceable as what it claims to be.
+
+**A public repo with no `LICENSE` is all rights reserved**, whatever the README
+says. Measured 2026-09-18: five of eight public repos had none -- `hee-epoch`,
+`market-thesis`, `MT-logo-render`, `resume`, `tick-task` -- four of them
+described in `ARCHITECTURE.md` as a "Core Open Source Offering". Two of those
+carried an MIT badge pointing at a `LICENSE` file that did not exist, so they
+advertised terms they had no text to grant. Check the fact, not the badge:
+
+```sh
+gh api "orgs/Twin-Cities-Open-Systems/repos?per_page=100" \
+  --jq '.[] | select(.private|not) | "\(.license.spdx_id // "NONE")\t\(.name)"'
+```
+
+### Branding a license -- what GPLv3 actually allows
+
+A house-flavored license ("YAW", or any other) is built as **GPL-3.0 plus
+§7 additional terms**, never as edited GPL text. §7 is asymmetric and that
+asymmetry is the whole answer:
+
+- **Additional permissions** -- anything that relaxes the license. Unlimited.
+- **Additional restrictions** -- only the closed list in §7(a)-(f): warranty and
+  liability wording, preserving attribution or legal notices, prohibiting
+  misrepresentation of origin and requiring modified versions be marked,
+  limiting publicity use of names, declining trademark rights, and requiring
+  indemnification.
+
+Anything else is a "further restriction" under §10: void, and it makes the
+result non-free and GPL-incompatible.
+
+So a branded layer that asserts **identity** -- attribution, "mark your fork as
+yours", no trademark grant on the name, no implying endorsement -- is entirely
+buildable. A clause that restricts **who may use the software or what for** is
+not, at any length of drafting. That is the fail-fast answer for anyone asked to
+research one.
+
 ## Local git config (once per machine)
 
 ```bash
