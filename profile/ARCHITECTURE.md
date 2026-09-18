@@ -25,6 +25,11 @@ Our workload is divided across specialized repositories with distinct boundaries
 *   **Contents:** Features environment orchestration scripts, automated infrastructure maintenance pipelines, localized high-frequency cron utilities, and access configuration keys.
 *   **Integration:** Interfaces programmatically with external cloud provider environments and organization-wide repository management logic.
 
+### [secrets](https://github.com/Twin-Cities-Open-Systems/secrets) (Very Private) (Sealed Credential Store)
+*   **Purpose:** Serves as the single organization-wide store for sealed credentials -- GPG- and age-encrypted ciphertext tracked in git and opened only by `hee cred` into one child process -- and the interim for the bastion-hosted key store HEE Policy section 24 names as unbuilt.
+*   **Contents:** Features the `.hee/secrets` store `hee cred` reads by default, per-host passphrase-sealed identity keys for first-login bootstrap, a ledger recording what each sealed file is, which keys open it and on which hosts, and the migration plan that retires the per-repo and home-directory stores it replaces.
+*   **Integration:** Consumed by every host's `hee cred -run ... -exec` call and the dotfiles wrappers; never imported as code. Holds ciphertext only: CI fails on any tracked store file that is not a GPG packet stream or an age file, and the deliberate `.gitignore` re-include of `.hee/secrets/*.gpg` is why this repository must never become public.
+
 ### [tcos-www](https://github.com/Twin-Cities-Open-Systems/tcos-www) (Public) (Public Web Presence)
 *   **Purpose:** Serves as the primary public-facing entry point, digital storefront, and official brand homepage for the organization.
 *   **Contents:** Features optimized production landing page assets, client-side routing structures, embedded documentation portals, and deployment configurations for marketing builds.
