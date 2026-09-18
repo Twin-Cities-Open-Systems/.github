@@ -94,6 +94,10 @@ buildable. A clause that restricts **who may use the software or what for** is
 not, at any length of drafting. That is the fail-fast answer for anyone asked to
 research one.
 
+A reviewable draft of such a layer, clause by clause against §7, is
+`profile/YAW-ADDITIONAL-TERMS.md`. It is adopted nowhere and is not legal
+advice.
+
 ## Local git config (once per machine)
 
 ```bash
