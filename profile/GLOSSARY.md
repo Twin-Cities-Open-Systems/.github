@@ -247,12 +247,16 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Consequence for design:** a hash-compared credential requires the verifier to **be** the issuer, because only the issuer holds the value to compare against. A signature removes that restriction. Any requirement to prove something to a party who did not issue it is therefore a signature requirement, not a hashing one -- this is the whole distance between `HK1:` and `HK2:` in fleet-ops#700.
 * **Not the same as:** **Credential / Trust anchor**, which splits security objects by *who holds them*. This splits *what a value can prove*. The two compose: a trust anchor is believed because it is checked against a signature (authority), not because it was recomputed (continuity).
 
-### kid (keyhole id)
+### hkid (hee keyhole id)
 * **Type:** Core Vocabulary -- reserved term
-* **Invariant Standard:** **`kid` means keyhole id and nothing else. Write "child" / "children" for offspring, never "kid".** Ruling by Spencer, 2026-09-20, on a succession design where both senses appeared in the same paragraph. A `kid` is the 26-character public handle of one keyhole row in `tools/store` (`store/db.py`, `KID_LEN = 26`, drawn from `CODE_ALPHABET`), and it is what travels in `GET /api/keyhole/<kid>/image`.
-* **Why it is reserved rather than merely preferred:** the two senses genuinely collide in the documents where succession, custody and credentials are discussed together -- key custody for one's children, and keyhole ids, are the same conversation in fleet-ops#713 and #710. Ambiguity there is not stylistic.
-* **Second collision, unresolved:** in **JWT/JOSE, `kid` is the standard claim name for "key ID"** (RFC 7515 §4.1.4). TCOS now has both a PKI and a keyhole system, so that term will meet this one. The store's is the younger and cheaper to rename. Not yet decided -- see the `JWT (JSON Web Token)` entry, which is already careful that a JWT is neither a credential nor a trust anchor.
-* **Footgun it produced once already:** the `kid` was designed as a public handle that "grants nothing", then half A was changed to `HMAC-SHA256(STORE_KEYHOLE_KEY, kid)` for unrelated reasons, which made the handle an input to the secret and, for a one-half keyhole, sufficient on its own (fleet-ops#706). See **Continuity / Authority**.
+* **Invariant Standard:** **`hkid` is the hee keyhole id.** Coined by Spencer 2026-09-20 to settle two collisions at once. Write **`hkid`** for the identifier, and **child / children** for offspring -- never "kid" for either.
+* **What it names:** the 26-character public handle of one keyhole row in `tools/store` (`store/db.py`, `KID_LEN = 26`, drawn from `CODE_ALPHABET`), the value that travels in `GET /api/keyhole/<hkid>/image` and in the middle field of an `HK1:` payload.
+* **The two collisions it resolves:**
+  1. **"kid" as offspring.** Key custody for one's children and keyhole ids are the same conversation in fleet-ops#713 and #710, where succession, trust custody and credentials are discussed together. The ambiguity there is not stylistic.
+  2. **`kid` as "key ID" in JWT/JOSE** (RFC 7515 §4.1.4), which is a standard claim name. TCOS now operates both a PKI and a keyhole system, so the bare term was going to be ambiguous in exactly the documents where precision matters most. The `h` prefix namespaces it to HEE and the conflict disappears rather than being adjudicated.
+* **Naming rule it illustrates:** where a term the org coins would collide with an established standard's term for a *different* thing, prefix rather than argue. The standard will not move.
+* **Footgun the concept already produced, independent of its name:** the identifier was designed as a public handle that "grants nothing", then half A was changed to `HMAC-SHA256(STORE_KEYHOLE_KEY, hkid)` for unrelated reasons, which made the handle an input to the secret and, for a one-half keyhole, sufficient on its own (fleet-ops#706). See **Continuity / Authority**.
+* **Adoption status:** the term is canonical from 2026-09-20. **The store's code still says `kid`** across 11 files, including a JSON response key live clients read and a SQLite column in a deployed store. Renaming it is tracked separately, not assumed done.
 
 ### render view
 * **Type:** Design/UX System
