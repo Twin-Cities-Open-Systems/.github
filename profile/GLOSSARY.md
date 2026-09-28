@@ -126,6 +126,18 @@ This document serves as the immutable, single source of truth (SSoT) for termino
 * **Authority does not come from the object.** See `Chain Authority` below -- this is the single most misread property of Cards and Pills.
 * **Downstream docs reference THIS entry.** `human-execution-engine`'s `docs/DOCUMENTATION_POLICY.md` carries a doc-type table that restates Card, Pill and Blueprint; that table should point here rather than define independently. Operator, 2026-09-02: *"glossary is ssot. make the other docs ref the glossary."*
 
+### Fixture (and the inuid_null_reason vocabulary)
+* **Type:** Core Vocabulary
+* **Definition (this document is the SSoT for the term; the enforcement authority is the kind-registry):** A **fixture** is a HEE-object YAML record that exists as **sample / example / template data** -- to demonstrate a shape or exercise tooling -- not as a real, tracked instance of the thing it describes. Because it names no real instance, it carries **no unique identity**: `metadata.annotations.inuid: null` with `metadata.annotations.inuid_null_reason: fixture`. Example: the samples in `human-execution-engine` `hee/measure/samples/` are fixtures. **Contrast:** the example store catalog under `fleet-ops` `stores/` is NOT a fixture -- those are real tracked inventory records, so they carry a real `inuid` (or `soa_pending` until the epoch that computes it exists; see below).
+* **Why `inuid` may be null here:** every HEE object requires `metadata.annotations.inuid` (see `HEE Object Kinds`). `hee-lint` permits it to be `null` **only** with an accompanying `inuid_null_reason`, drawn from a fixed vocabulary. The `human-execution-engine`'s `hee/contracts/hee.kind-registry.contract.v1.yaml` `spec.inuid_rules.allowed_null_reasons` is the enforcement point.
+* **The sanctioned reasons:**
+  * **fixture** -- untracked sample data used to exercise tooling, as above.
+  * **example** -- a template shown to users to copy (e.g. a `*.example.*` card the docs tell you to duplicate into your own space). Like a fixture, it names no real tracked instance.
+  * **bootstrap** -- a foundational object authored before the identity chain it would root through exists yet (see `Chain Authority`); unanchored by construction, not by omission.
+  * **test** -- data that exists only to drive a test and is never a real instance.
+  * **soa_pending** -- a **real, tracked** object whose true `inuid` is its SOA provenance hash, one leg of which comes from `~/.hee/index/_.yaml` -- the identity epoch that does not exist yet (see `Chain Authority`; fleet-ops#102/#154). Its inuid is deferred, not absent: `hee-inv` stamps `soa_pending` on new inventory now, and the real inuid is backfilled when the epoch lands. This is the honest state for real inventory today -- do **not** mark it `fixture` (that would claim it is untracked) and do **not** mint a placeholder hash (that would collide with the real derivation).
+* **Invariant:** only reasons in the registry's `allowed_null_reasons` are valid; any other value (e.g. `personal`) is drift to reconcile, not a new reason to mint. A null `inuid` without a reason is a `hee-lint` CRITICAL.
+
 ### Chain Authority
 * **Type:** Foundational Principle
 * **Invariant Standard:** A HEE object is **not authoritative on its own**, and that is the design rather than a limitation. Authority comes from a **GPG-bounded chain running from the lowest root source up to the hee epoch**. An object carries content; the chain carries authority. Operator, 2026-09-02: *"they are not auth by themselfs, they are auth by the gpg bounded chain from the lowest root source to the hee epoch."*
