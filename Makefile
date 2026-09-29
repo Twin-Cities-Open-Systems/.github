@@ -15,11 +15,10 @@
 # here (HEE Policy, PROMPTING_RULES.md rule 10).
 
 TCOS_WWW := $(HOME)/git/tcos-www
-TCOS_APP := $(HOME)/git/tcos-app
 RESUME   := $(HOME)/git/resume
 VIEW_VMID := 107
 
-.PHONY: lab lab-tcos-www lab-tcos-app lab-blog lab-old-commits lab-tree-index lab-verify release
+.PHONY: lab lab-tcos-www lab-blog lab-old-commits lab-tree-index lab-verify release
 
 lab: lab-tcos-www lab-blog lab-verify
 
@@ -39,18 +38,9 @@ lab-tcos-www:
 		pct exec $(VIEW_VMID) -- sh -c 'rm -rf /www/tcos-www && mkdir -p /www/tcos-www && tar -xzf /tmp/tcos-www-static.tar.gz -C /www/tcos-www'"
 	rm -rf /tmp/lab-deploy-tcos-www-src /tmp/lab-deploy-tcos-www
 
-# Lab mirror of tcos.app (repo tcos-app), served at app.lab.tcos.us from
-# /www/tcos-app. Unlike lab-tcos-www there is no link transform: the page's
-# only links are root-relative assets, which resolve on the lab vhost as-is.
-# tcos-app's own deploy.sh calls this (`make lab-tcos-app TCOS_APP=<checkout>`).
-lab-tcos-app:
-	rm -rf /tmp/lab-deploy-tcos-app
-	mkdir -p /tmp/lab-deploy-tcos-app
-	cd $(TCOS_APP) && tar -czf /tmp/lab-deploy-tcos-app/site.tar.gz index.html robots.txt css
-	scp /tmp/lab-deploy-tcos-app/site.tar.gz pve:/tmp/tcos-app-static.tar.gz
-	ssh pve "pct push $(VIEW_VMID) /tmp/tcos-app-static.tar.gz /tmp/tcos-app-static.tar.gz && \
-		pct exec $(VIEW_VMID) -- sh -c 'rm -rf /www/tcos-app && mkdir -p /www/tcos-app && tar -xzf /tmp/tcos-app-static.tar.gz -C /www/tcos-app'"
-	rm -rf /tmp/lab-deploy-tcos-app
+# tcos.app has no target here on purpose: its lab surface (app.lab.tcos.us) is
+# installed by lab-pull on pve from tcos-app's own release, with no ssh and no
+# hand-push. See fleet-ops pve/lab-deploy/README.md.
 
 # Real single-target deploy for resume's real blog output
 # ($(RESUME)/dist/ -- the actual wrangler pages_build_output_dir).
