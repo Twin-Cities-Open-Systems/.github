@@ -18,6 +18,10 @@ TCOS_WWW := $(HOME)/git/tcos-www
 TCOS_APP := $(HOME)/git/tcos-app
 RESUME   := $(HOME)/git/resume
 VIEW_VMID := 107
+# The view container's /www is a bind mount of this share directory on pve.
+# lab-pull re-owns it to the export's squash uid, so container root (host uid
+# 100000) cannot write there; write as root on pve and re-own to match.
+LAB_WWW := /data/storage/lab/www
 
 .PHONY: lab lab-tcos-www lab-tcos-app lab-blog lab-old-commits lab-tree-index lab-verify release
 
@@ -48,8 +52,9 @@ lab-tcos-app:
 	mkdir -p /tmp/lab-deploy-tcos-app
 	cd $(TCOS_APP) && tar -czf /tmp/lab-deploy-tcos-app/site.tar.gz index.html robots.txt css
 	scp /tmp/lab-deploy-tcos-app/site.tar.gz pve:/tmp/tcos-app-static.tar.gz
-	ssh pve "pct push $(VIEW_VMID) /tmp/tcos-app-static.tar.gz /tmp/tcos-app-static.tar.gz && \
-		pct exec $(VIEW_VMID) -- sh -c 'rm -rf /www/tcos-app && mkdir -p /www/tcos-app && tar -xzf /tmp/tcos-app-static.tar.gz -C /www/tcos-app'"
+	ssh pve "rm -rf $(LAB_WWW)/tcos-app && mkdir -p $(LAB_WWW)/tcos-app && \
+		tar -xzf /tmp/tcos-app-static.tar.gz -C $(LAB_WWW)/tcos-app && \
+		chown -R 1000:1005 $(LAB_WWW)/tcos-app && rm -f /tmp/tcos-app-static.tar.gz"
 	rm -rf /tmp/lab-deploy-tcos-app
 
 # Real single-target deploy for resume's real blog output
