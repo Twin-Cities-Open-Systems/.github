@@ -30,6 +30,11 @@ Our workload is divided across specialized repositories with distinct boundaries
 *   **Contents:** Features the `.hee/secrets` store `hee cred` reads by default, per-host passphrase-sealed identity keys for first-login bootstrap, a ledger recording what each sealed file is, which keys open it and on which hosts, and the migration plan that retires the per-repo and home-directory stores it replaces.
 *   **Integration:** Consumed by every host's `hee cred -run ... -exec` call and the dotfiles wrappers; never imported as code. Holds ciphertext only: CI fails on any tracked store file that is not a GPG packet stream or an age file, and the deliberate `.gitignore` re-include of `.hee/secrets/*.gpg` is why this repository must never become public.
 
+### [tcos-app](https://github.com/Twin-Cities-Open-Systems/tcos-app) (Public) (Home of Every Web Page)
+*   **Purpose:** The org's primary go-to for all things web page (operator, 2026-10-01). It owns the shared shell every TCOS page inherits, the registry and release procedure of the `*.tcos.app` apps, and, as it grows, the widgets, tools and resources pages share.
+*   **Contents:** `shell.manifest` and the files it names: `css/shell.css` (WCAG-measured color tokens; light, dark and named themes behind one selector; text sizes; cards, chips, tables; flip cards, the way-back pill, the dock; print) and `js/shell.js` (header controls, `TC.flip`, `TC.wayback`), plus `apps.yaml` and the generated tcos.app index.
+*   **Integration:** Children copy the shell and fail CI when their copy drifts from tcos-app main: ham-tcos-app, tcos-www and resume through `sync-shell.sh`, and fleet-ops view.lab (with mf.lab and store.lab) at build time. A UI improvement made for one site lands in tcos-app first. See tcos-app's `CLAUDE.md`, "tcos-app is the home of every TCOS web page".
+
 ### [tcos-www](https://github.com/Twin-Cities-Open-Systems/tcos-www) (Public) (Public Web Presence)
 *   **Purpose:** Serves as the primary public-facing entry point, digital storefront, and official brand homepage for the organization.
 *   **Contents:** Features optimized production landing page assets, client-side routing structures, embedded documentation portals, and deployment configurations for marketing builds.

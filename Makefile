@@ -18,39 +18,43 @@ TCOS_WWW := $(HOME)/git/tcos-www
 RESUME   := $(HOME)/git/resume
 VIEW_VMID := 107
 
-.PHONY: lab lab-tcos-www lab-blog lab-old-commits lab-tree-index lab-verify release
+.PHONY: help lab lab-tcos-www lab-blog lab-old-commits lab-tree-index lab-verify release
 
-lab: lab-tcos-www lab-blog lab-verify
+help:
+	@echo "make targets (this repo's lab helpers for view.lab):"
+	@echo "  help             this list"
+	@echo "  lab              lab-verify (the site deploys moved, see below)"
+	@echo "  lab-verify       status codes of lab.tcos.us and the blog host"
+	@echo "  lab-old-commits  build and push view.lab's old-commits.html (LOCAL=ndjson optional)"
+	@echo "  lab-tree-index   build and push view.lab's files/ and diffs/ indexes"
+	@echo "  lab-tcos-www     RETIRED: tcos-www CI payload + lab-pull; tcos-www ./deploy.sh lab"
+	@echo "  lab-blog         RETIRED: resume bin/deploy-pages.sh lab (rsync into the share)"
+	@echo "  release          not implemented (fleet-ops#295)"
 
-# Real single-target deploy -- "make only this" -- package+transform
-# tcos-www's static real pages (html + css/js/shell, the asset dirs
-# missed on the very first hand-run of this process) and push them to
-# the view container's real webroot.
+lab: lab-verify
+
+# lab-tcos-www and lab-blog are RETIRED (2026-10-01). Both pushed over
+# `ssh pve` + `pct push` into ct107, whose /www is pve's share now, owned
+# 1000:1005, which container root cannot write; and the fleet does not ssh to
+# pve for a lab deploy (fleet-ops ticket 0148). Their replacements:
+#   tcos-www  CI publishes a payload (this repo's bin/lab_link_transform.py is
+#             still the transform); lab-pull installs it (fleet-ops#928);
+#             tcos-www's ./deploy.sh lab waits for it.
+#   resume    bin/deploy-pages.sh lab rsyncs dist/ into the lab share
+#             (resume#116), the same path as media/bin/deploy.sh.
+# The targets stay, failing loudly, so a muscle-memory `make lab` says where
+# the work went instead of hanging on an ssh prompt.
 lab-tcos-www:
-	rm -rf /tmp/lab-deploy-tcos-www
-	bin/lab_link_transform.py $(TCOS_WWW) /tmp/lab-deploy-tcos-www-src
-	mkdir -p /tmp/lab-deploy-tcos-www
-	cd /tmp/lab-deploy-tcos-www-src && tar -czf /tmp/lab-deploy-tcos-www/site.tar.gz \
-		activity.html careers.html contact.html contracts.html index.html ir.html people.html story.html \
-		css js shell
-	scp /tmp/lab-deploy-tcos-www/site.tar.gz pve:/tmp/tcos-www-static.tar.gz
-	ssh pve "pct push $(VIEW_VMID) /tmp/tcos-www-static.tar.gz /tmp/tcos-www-static.tar.gz && \
-		pct exec $(VIEW_VMID) -- sh -c 'rm -rf /www/tcos-www && mkdir -p /www/tcos-www && tar -xzf /tmp/tcos-www-static.tar.gz -C /www/tcos-www'"
-	rm -rf /tmp/lab-deploy-tcos-www-src /tmp/lab-deploy-tcos-www
+	@echo "lab-tcos-www: retired -- tcos-www's CI publishes a payload and lab-pull installs it; run ./deploy.sh lab in tcos-www to wait for it" >&2
+	@exit 1
 
 # tcos.app has no target here on purpose: its lab surface (app.lab.tcos.us) is
 # installed by lab-pull on pve from tcos-app's own release, with no ssh and no
 # hand-push. See fleet-ops pve/lab-deploy/README.md.
 
-# Real single-target deploy for resume's real blog output
-# ($(RESUME)/dist/ -- the actual wrangler pages_build_output_dir).
 lab-blog:
-	rm -f /tmp/resume-blog-static.tar.gz
-	cd $(RESUME)/dist && tar -czf /tmp/resume-blog-static.tar.gz .
-	scp /tmp/resume-blog-static.tar.gz pve:/tmp/resume-blog-static.tar.gz
-	ssh pve "pct push $(VIEW_VMID) /tmp/resume-blog-static.tar.gz /tmp/resume-blog-static.tar.gz && \
-		pct exec $(VIEW_VMID) -- sh -c 'rm -rf /www/spencer-blog && mkdir -p /www/spencer-blog && tar -xzf /tmp/resume-blog-static.tar.gz -C /www/spencer-blog'"
-	rm -f /tmp/resume-blog-static.tar.gz
+	@echo "lab-blog: retired -- resume's bin/deploy-pages.sh lab rsyncs dist/ into the lab share" >&2
+	@exit 1
 
 # Real, honest post-deploy check -- not a substitute for hee-view
 # --sites (which reads SITEMAP.yaml), just a fast sanity pass on the
